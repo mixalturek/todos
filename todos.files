@@ -1,0 +1,14 @@
+./COPYING
+./Makefile
+./src_tests/todos/__init__.py
+./src_tests/todos/test_FilesSearch_data/file
+./src_tests/todos/test_FilesSearch_data/subdir/file
+./src_tests/todos/test_FilesSearch.py
+./src/todos/FilesSearch.py
+./src/todos/__init__.py
+./TODO
+./todos.config
+./todos.creator
+./todos.creator.user
+./todos.files
+./todos.includes
