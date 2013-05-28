@@ -27,5 +27,6 @@ class FilesSearchTestCase(unittest.TestCase):
 	def test_search(self):
 		files_search = FilesSearch()
 		actual = files_search.search('./test_FilesSearch_data')
-		expected = ['./test_FilesSearch_data/subdir/file', './test_FilesSearch_data/file']
-		self.assertEqual(expected, actual)
+		self.assertEqual(2, len(actual))
+		self.assertEqual(1, actual.count('./test_FilesSearch_data/file'))
+		self.assertEqual(1, actual.count('./test_FilesSearch_data/subdir/file'))
