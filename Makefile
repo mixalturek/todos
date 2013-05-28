@@ -46,7 +46,7 @@ lines:
 .PHONY: sloccount
 sloccount:
 	mkdir -p $(BUILD_DIR)
-	sloccount --duplicates --wide --details . > $(BUILD_DIR)/sloccount.sc
+	sloccount --duplicates --wide --details src > $(BUILD_DIR)/sloccount.sc
 
 
 ###############################################################################

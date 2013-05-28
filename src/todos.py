@@ -28,9 +28,13 @@ import re
 
 
 ###############################################################################
-####
+#### Configuration, default values
 
 VERSION = '0.1.0'
+
+PATTERNS = ['TODO', 'FIXME']
+SUPPRESSED = ['.git', '.svn', 'CVS']
+DIRECTORIES = ['.']
 
 
 ###############################################################################
@@ -57,10 +61,43 @@ class CommentsSearch:
 		self.__comments = []
 
 
+	def dumpConfiguration(self):
+		self.verbose('Command line parameters:')
+		self.verbose('verbose: ' + str(self.__parameters.verbose))
+		self.verbose('patterns: ' + str(self.__parameters.patterns))
+		self.verbose('extensions: ' + str(self.__parameters.extensions))
+		self.verbose('suppressed-dirs: ' + str(self.__parameters.suppressed))
+		self.verbose('txt: ' + str(self.__parameters.txt))
+		self.verbose('xml: ' + str(self.__parameters.xml))
+		self.verbose('html: ' + str(self.__parameters.html))
+		# TODO: rename to directories somehow
+		self.verbose('directories: ' + str(self.__parameters.directory))
+		self.verbose('')
+
+
 	def search(self):
-		files = []
+		self.processDirectories()
+
+
+	def verbose(self, message):
+		if self.__parameters.verbose:
+			print(message)
+
+
+	def processDirectories(self):
 		for directory in self.__parameters.directory:
 			self.processDirectory(directory)
+
+
+	def isDirectorySuppressed(self, directory):
+		if self.__parameters.suppressed is None:
+			return False
+
+		for suppressed in self.__parameters.suppressed:
+			if directory.endswith(suppressed):
+				return True
+
+		return False
 
 
 	def processDirectory(self, directory):
@@ -70,21 +107,40 @@ class CommentsSearch:
 		:param directory: the directory to search the files in
 		'''
 
-		# FIXME: verify it is a directory
+		if not os.path.isdir(directory):
+			self.verbose('Skipping directory (not a directory): ' + directory)
+			return
+
+		if self.isDirectorySuppressed(directory):
+			self.verbose('Skipping directory (suppressed): ' + directory)
+			return
 
 		for item in os.listdir(directory):
 			path = os.path.join(directory, item)
 
 			if os.path.isfile(path):
-				# TODO: check extension
 				self.processFile(path)
-			elif os.path.isdir(path) and item not in self.__parameters.excludeDirs:
+			else:
 				self.processDirectory(path)
 
 
+	def isFileExtensionAllowed(self, file):
+		if self.__parameters.extensions is None:
+			return True
+
+		for extension in self.__parameters.extensions:
+			if file.endswith(extension):
+				return True
+
+		return False
+
+
 	def processFile(self, file):
-		if self.__parameters.verbose:
-			print('Parsing file: ' + file)
+		if not self.isFileExtensionAllowed(file):
+			self.verbose('Skipping file (file extension): ' + file)
+			return
+
+		self.verbose('Parsing file: ' + file)
 
 		try:
 			with open(file, 'r') as f:
@@ -95,8 +151,7 @@ class CommentsSearch:
 				++pos
 				self.processLine(file, pos, line)
 		except UnicodeError:
-			if self.__parameters.verbose:
-				print('Skipping file: ' + file)
+			self.verbose('Skipping file (unicode error): ' + file)
 
 
 	def processLine(self, file, pos, line):
@@ -116,14 +171,15 @@ class CommentsSearch:
 ###############################################################################
 ####
 
-def main():
+def parseParameters():
 	patterns = ['TODO', 'FIXME']
-	excludeDirs = ['.git', '.svn', 'CVS']
+	suppressed = ['.git', '.svn', 'CVS']
+	directories = ['.']
 
 	parser = argparse.ArgumentParser(
-		prog='todos',
-		description='Search project directory for TODO, FIXME and similar comments.',
-		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+			prog='todos',
+			description='Search project directory for TODO, FIXME and similar comments.',
+			formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 	parser.add_argument(
 			'-V', '--version',
@@ -140,9 +196,9 @@ def main():
 	parser.add_argument(
 			'-p', '--pattern',
 			nargs='+',
-			help='the search patterns',
+			help='the search pattern',
 			dest='patterns',
-			default=patterns)
+			default=PATTERNS)
 
 	parser.add_argument(
 			'-f', '--file-ext',
@@ -152,12 +208,11 @@ def main():
 			dest='extensions')
 
 	parser.add_argument(
-			'-D', '--exclude-dir',
+			'-D', '--suppressed',
 			metavar='DIR',
 			nargs='+',
-			help='exclude the specified directories',
-			dest='excludeDirs',
-			default=excludeDirs)
+			help='suppress the specified directory',
+			default=SUPPRESSED)
 
 	parser.add_argument(
 			'-t', '--txt',
@@ -178,26 +233,17 @@ def main():
 			'directory',
 			nargs='*',
 			help='the input directory to search in',
-			default='.')
+			default=DIRECTORIES)
 
-	parameters = parser.parse_args()
-
-	# TODO: remove
-	if parameters.verbose:
-		print 'Command line parameters:'
-		print '\tverbose:', parameters.verbose
-		print '\tpatterns:', parameters.patterns
-		print '\textensions:', parameters.extensions
-		print '\texclude-dirs:', parameters.excludeDirs
-		print '\ttxt:', parameters.txt
-		print '\txml:', parameters.xml
-		print '\thtml:', parameters.html
-		# TODO: rename to directories somehow
-		print '\tdirectories:', parameters.directory
-		print
+	return parser.parse_args()
 
 
-	commentsSearch = CommentsSearch(parameters)
+###############################################################################
+####
+
+def main():
+	commentsSearch = CommentsSearch(parseParameters())
+	commentsSearch.dumpConfiguration()
 	commentsSearch.search()
 
 	# TODO: remove
