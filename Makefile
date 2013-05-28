@@ -40,8 +40,8 @@ extra: doc lines sloccount
 
 .PHONY: tests
 tests:
-	ln -s ../../src/todos src_tests/todos || true
-	cd src_tests/todos/ && unit2 discover -v
+	ln -s ../todos todos_tests || true
+	cd todos_tests/ && unit2 discover -v
 
 
 ###############################################################################
@@ -55,7 +55,7 @@ lines:
 .PHONY: sloccount
 sloccount:
 	mkdir -p $(BUILD_DIR)
-	sloccount --duplicates --wide --details src src_tests > $(BUILD_DIR)/sloccount.sc
+	sloccount --duplicates --wide --details todos todos_tests > $(BUILD_DIR)/sloccount.sc
 
 
 ###############################################################################
@@ -84,5 +84,5 @@ qtcreator:
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -f src_tests/todos/todos
+	rm -f todos_tests/todos
 	find . -name '*.pyc' -exec rm {} \;
