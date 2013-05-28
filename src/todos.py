@@ -62,7 +62,7 @@ class CommentsSearch:
 
 
 	def dumpConfiguration(self):
-		self.verbose('Command line parameters:')
+		self.verbose('Command line arguments:')
 		self.verbose('verbose: ' + str(self.__parameters.verbose))
 		self.verbose('patterns: ' + str(self.__parameters.patterns))
 		self.verbose('extensions: ' + str(self.__parameters.extensions))
@@ -70,8 +70,7 @@ class CommentsSearch:
 		self.verbose('txt: ' + str(self.__parameters.txt))
 		self.verbose('xml: ' + str(self.__parameters.xml))
 		self.verbose('html: ' + str(self.__parameters.html))
-		# TODO: rename to directories somehow
-		self.verbose('directories: ' + str(self.__parameters.directory))
+		self.verbose('directories: ' + str(self.__parameters.directories))
 		self.verbose('')
 
 
@@ -85,7 +84,7 @@ class CommentsSearch:
 
 
 	def processDirectories(self):
-		for directory in self.__parameters.directory:
+		for directory in self.__parameters.directories:
 			self.processDirectory(directory)
 
 
@@ -162,7 +161,7 @@ class CommentsSearch:
 				break
 
 
-	# TODO: remove
+	# TODO: debug
 	def dumpComments(self):
 		for comment in self.__comments:
 			print(str(comment))
@@ -171,7 +170,7 @@ class CommentsSearch:
 ###############################################################################
 ####
 
-def parseParameters():
+def parseCommandLineArguments():
 	patterns = ['TODO', 'FIXME']
 	suppressed = ['.git', '.svn', 'CVS']
 	directories = ['.']
@@ -233,20 +232,27 @@ def parseParameters():
 			'directory',
 			nargs='*',
 			help='the input directory to search in',
+			# ValueError: dest supplied twice for positional argument
+			# dest='directories',
 			default=DIRECTORIES)
 
-	return parser.parse_args()
+	parameters = parser.parse_args()
+
+	# Workaround for ValueError: dest supplied twice for positional argument
+	parameters.directories = parameters.directory
+
+	return parameters
 
 
 ###############################################################################
 ####
 
 def main():
-	commentsSearch = CommentsSearch(parseParameters())
+	commentsSearch = CommentsSearch(parseCommandLineArguments())
 	commentsSearch.dumpConfiguration()
 	commentsSearch.search()
 
-	# TODO: remove
+	# TODO: debug
 	commentsSearch.dumpComments()
 
 
