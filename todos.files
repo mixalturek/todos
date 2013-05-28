@@ -1,4 +1,5 @@
 ./COPYING
+./Doxyfile
 ./Makefile
 ./src_tests/todos/__init__.py
 ./src_tests/todos/test_FilesSearch_data/file

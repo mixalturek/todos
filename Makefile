@@ -32,7 +32,7 @@ all: tests
 
 
 .PHONY: extra
-extra: lines sloccount
+extra: doc lines sloccount
 
 
 ###############################################################################
@@ -56,6 +56,15 @@ lines:
 sloccount:
 	mkdir -p $(BUILD_DIR)
 	sloccount --duplicates --wide --details src src_tests > $(BUILD_DIR)/sloccount.sc
+
+
+###############################################################################
+#### Documentation
+
+.PHONY: doc
+doc:
+	mkdir -p $(BUILD_DIR)/doc
+	doxygen Doxyfile
 
 
 ###############################################################################
