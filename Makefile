@@ -28,20 +28,11 @@ BUILD_DIR = build
 #### Default
 
 .PHONY: all
-all: tests
+all:
 
 
 .PHONY: extra
 extra: doc lines sloccount
-
-
-###############################################################################
-#### Unit tests
-
-.PHONY: tests
-tests:
-	ln -s ../todos todos_tests || true
-	cd todos_tests/ && unit2 discover -v
 
 
 ###############################################################################
@@ -55,7 +46,7 @@ lines:
 .PHONY: sloccount
 sloccount:
 	mkdir -p $(BUILD_DIR)
-	sloccount --duplicates --wide --details todos todos_tests > $(BUILD_DIR)/sloccount.sc
+	sloccount --duplicates --wide --details . > $(BUILD_DIR)/sloccount.sc
 
 
 ###############################################################################
@@ -84,5 +75,4 @@ qtcreator:
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -f todos_tests/todos
 	find . -name '*.pyc' -exec rm {} \;
