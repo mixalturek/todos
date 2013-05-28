@@ -20,31 +20,17 @@
 #
 
 
-import os
-import os.path
+class Comment:
+	def __init__(self, pattern, file, pos, line):
+		self.__pattern = pattern
+		self.__file = file
+		self.__pos = pos
+		self.__line = line.strip()
 
 
-class FilesSearch:
-	def __init__(self):
-		pass
+	def __str__(self):
+		return self.__file + ":" + str(self.__pos) + ": " + self.__line
 
 
-	def search(self, directory):
-		"""
-		Recursively search files in a directory.
-
-		:param directory: the directory to search the files in
-		:returns: the list of paths to the files relative to the input directory
-		"""
-
-		files = []
-
-		for item in os.listdir(directory):
-			path = os.path.join(directory, item)
-
-			if os.path.isfile(path):
-				files.append(path)
-			elif os.path.isdir(path):
-				files.extend(self.search(path))
-
-		return files
+	def __repr__(self):
+		return self.__str__()

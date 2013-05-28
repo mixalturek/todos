@@ -19,14 +19,40 @@
 # along with todos.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Execute with
+# $ python todos/__main__.py (python 2.6+)
+# $ python -m todos          (python 2.7+)
 
-import unittest
+
+import sys
+#import todos
 from todos.FilesSearch import FilesSearch
+from todos.CommentsSearch import CommentsSearch
 
-class FilesSearchTestCase(unittest.TestCase):
-	def test_search(self):
-		filesSearch = FilesSearch()
-		actual = filesSearch.search('./test_FilesSearch_data')
-		self.assertEqual(2, len(actual))
-		self.assertEqual(1, actual.count('./test_FilesSearch_data/file'))
-		self.assertEqual(1, actual.count('./test_FilesSearch_data/subdir/file'))
+
+def main(argv):
+	# TODO: parse command line arguments
+	defaultPatterns = ['TODO', 'FIXME', '@[A-Z]{2,3}@']
+
+	filesSearch = FilesSearch()
+	files = filesSearch.search('.')
+
+	commentsSearch = CommentsSearch(defaultPatterns)
+
+	for file in files:
+		# TODO: verbose only
+		# print('Parsing: ' + file)
+		try:
+			commentsSearch.processFile(file)
+		except UnicodeError:
+			print('Skipped: ' + file)
+
+	# TODO: remove
+	commentsSearch.dumpComments()
+
+
+if __name__ == '__main__':
+	try:
+		main(sys.argv)
+	except KeyboardInterrupt:
+		sys.exit('\nERROR: Interrupted by user')

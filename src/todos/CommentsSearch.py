@@ -20,31 +20,34 @@
 #
 
 
-import os
-import os.path
+import re
+from todos.Comment import Comment
 
 
-class FilesSearch:
-	def __init__(self):
-		pass
+class CommentsSearch:
+	def __init__(self, patterns):
+		self.__patterns = patterns
+		self.__comments = []
 
 
-	def search(self, directory):
-		"""
-		Recursively search files in a directory.
+	def processFile(self, file):
+		with open(file, 'r') as f:
+			lines = f.readlines()
 
-		:param directory: the directory to search the files in
-		:returns: the list of paths to the files relative to the input directory
-		"""
+		pos = 0
+		for line in lines:
+			++pos
+			self.processLine(file, pos, line)
 
-		files = []
 
-		for item in os.listdir(directory):
-			path = os.path.join(directory, item)
+	def processLine(self, file, pos, line):
+		for pattern in self.__patterns:
+			if re.search(pattern, line):
+				self.__comments.append(Comment(pattern, file, pos, line))
+				break
 
-			if os.path.isfile(path):
-				files.append(path)
-			elif os.path.isdir(path):
-				files.extend(self.search(path))
 
-		return files
+	# TODO: remove
+	def dumpComments(self):
+		for comment in self.__comments:
+			print(str(comment))
