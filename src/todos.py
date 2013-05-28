@@ -20,10 +20,17 @@
 #
 
 
+import argparse
 import os
 import os.path
 import sys
 import re
+
+
+###############################################################################
+####
+
+VERSION = '0.1.0'
 
 
 ###############################################################################
@@ -38,30 +45,63 @@ class Comment:
 
 
 	def __str__(self):
-		return self.__file + ":" + str(self.__pos) + ": " + self.__line
+		return self.__file + ':' + str(self.__pos) + ': ' + self.__line
 
 
 ###############################################################################
 ####
 
 class CommentsSearch:
-	def __init__(self, patterns):
-		self.__patterns = patterns
+	def __init__(self, parameters):
+		self.__parameters = parameters
 		self.__comments = []
 
 
-	def processFile(self, file):
-		with open(file, 'r') as f:
-			lines = f.readlines()
+	def search(self):
+		files = []
+		for directory in self.__parameters.directory:
+			self.processDirectory(directory)
 
-		pos = 0
-		for line in lines:
-			++pos
-			self.processLine(file, pos, line)
+
+	def processDirectory(self, directory):
+		'''
+		Recursively search files in specified directories.
+
+		:param directory: the directory to search the files in
+		'''
+
+		# FIXME: verify it is a directory
+
+		for item in os.listdir(directory):
+			path = os.path.join(directory, item)
+
+			if os.path.isfile(path):
+				# TODO: check extension
+				self.processFile(path)
+			elif os.path.isdir(path) and item not in self.__parameters.excludeDirs:
+				self.processDirectory(path)
+
+
+	def processFile(self, file):
+		if self.__parameters.verbose:
+			print('Parsing file: ' + file)
+
+		try:
+			with open(file, 'r') as f:
+				lines = f.readlines()
+
+			pos = 0
+			for line in lines:
+				++pos
+				self.processLine(file, pos, line)
+		except UnicodeError:
+			if self.__parameters.verbose:
+				print('Skipping file: ' + file)
 
 
 	def processLine(self, file, pos, line):
-		for pattern in self.__patterns:
+		for pattern in self.__parameters.patterns:
+			# TODO: ignore case
 			if re.search(pattern, line):
 				self.__comments.append(Comment(pattern, file, pos, line))
 				break
@@ -76,53 +116,89 @@ class CommentsSearch:
 ###############################################################################
 ####
 
-class FilesSearch:
-	def __init__(self):
-		pass
+def main():
+	patterns = ['TODO', 'FIXME']
+	excludeDirs = ['.git', '.svn', 'CVS']
+
+	parser = argparse.ArgumentParser(
+		prog='todos',
+		description='Search project directory for TODO, FIXME and similar comments.',
+		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+	parser.add_argument(
+			'-V', '--version',
+			help='show version and exit',
+			action='version',
+			version='%(prog)s ' + VERSION)
+
+	parser.add_argument(
+			'-v', '--verbose',
+			help='increase output verbosity',
+			action='store_true',
+			default=0)
+
+	parser.add_argument(
+			'-p', '--pattern',
+			nargs='+',
+			help='the search patterns',
+			dest='patterns',
+			default=patterns)
+
+	parser.add_argument(
+			'-f', '--file-ext',
+			metavar='EXT',
+			nargs='+',
+			help='check only files with the specified extension',
+			dest='extensions')
+
+	parser.add_argument(
+			'-D', '--exclude-dir',
+			metavar='DIR',
+			nargs='+',
+			help='exclude the specified directories',
+			dest='excludeDirs',
+			default=excludeDirs)
+
+	parser.add_argument(
+			'-t', '--txt',
+			nargs='?',
+			help='the output text file; standard output will be used if the path is not specified')
+
+	parser.add_argument(
+			'-x', '--xml',
+			nargs=1,
+			help='the output XML file')
+
+	parser.add_argument(
+			'-m', '--html',
+			nargs=1,
+			help='the output HTML file')
+
+	parser.add_argument(
+			'directory',
+			nargs='*',
+			help='the input directory to search in',
+			default='.')
+
+	parameters = parser.parse_args()
+
+	# TODO: remove
+	if parameters.verbose:
+		print 'Command line parameters:'
+		print '\tverbose:', parameters.verbose
+		print '\tpatterns:', parameters.patterns
+		print '\textensions:', parameters.extensions
+		print '\texclude-dirs:', parameters.excludeDirs
+		print '\ttxt:', parameters.txt
+		print '\txml:', parameters.xml
+		print '\thtml:', parameters.html
+		# TODO: rename to directories somehow
+		print '\tdirectories:', parameters.directory
+		print
 
 
-	def search(self, directory):
-		"""
-		Recursively search files in a directory.
-
-		:param directory: the directory to search the files in
-		:returns: the list of paths to the files relative to the input directory
-		"""
-
-		files = []
-
-		for item in os.listdir(directory):
-			path = os.path.join(directory, item)
-
-			if os.path.isfile(path):
-				files.append(path)
-			elif os.path.isdir(path):
-				files.extend(self.search(path))
-
-		return files
-
-
-###############################################################################
-####
-
-def main(argv):
-	# TODO: parse command line arguments
-	defaultPatterns = ['TODO', 'FIXME', '@[A-Z]{2,3}@']
-
-	filesSearch = FilesSearch()
-	files = filesSearch.search('.')
-
-	commentsSearch = CommentsSearch(defaultPatterns)
-
-	for file in files:
-		# TODO: verbose only
-		# print('Parsing: ' + file)
-		try:
-			commentsSearch.processFile(file)
-		except UnicodeError:
-			# TODO: verbose only
-			# print('Skipped: ' + file)
-			pass
+	commentsSearch = CommentsSearch(parameters)
+	commentsSearch.search()
 
 	# TODO: remove
 	commentsSearch.dumpComments()
@@ -133,6 +209,6 @@ def main(argv):
 
 if __name__ == '__main__':
 	try:
-		main(sys.argv)
+		main()
 	except KeyboardInterrupt:
 		sys.exit('\nERROR: Interrupted by user')
