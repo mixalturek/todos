@@ -213,9 +213,10 @@ def parseCommandLineArguments():
 			default=False)
 
 	parser.add_argument(
-			'-p', '--pattern',
+			'-e', '--regexp',
 			nargs='+',
-			help='the search pattern',
+			help='the pattern to search',
+			metavar='pattern',
 			dest='patterns',
 			default=PATTERNS)
 
