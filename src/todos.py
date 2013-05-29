@@ -32,9 +32,11 @@ import re
 
 VERSION = '0.1.0'
 
+COMMENTS = ['#', '//', '/*']
 PATTERNS = ['TODO', 'FIXME']
 SUPPRESSED = ['.git', '.svn', 'CVS']
 DIRECTORIES = ['.']
+NUM_LINES = 1
 
 
 ###############################################################################
@@ -96,6 +98,7 @@ class CommentsSearch:
 	def dumpConfiguration(self):
 		self.verbose('Command line arguments:')
 		self.verbose('verbose: ' + str(self.parameters.verbose))
+		self.verbose('comments: ' + str(self.parameters.comments))
 		self.verbose('patterns: ' + str(self.parameters.patterns))
 		self.verbose('extensions: ' + str(self.parameters.extensions))
 		self.verbose('suppressed-dirs: ' + str(self.parameters.suppressed))
@@ -183,7 +186,18 @@ class CommentsSearch:
 			self.verbose('Skipping file (unicode error): ' + file)
 
 
+	def containsComment(self, line):
+		for comment in self.parameters.comments:
+			if line.count(comment) > 0:
+				return True
+
+		return False
+
+
 	def processLine(self, file, pos, line, lines):
+		if not self.containsComment(line):
+			return
+
 		for pattern in self.parameters.compiledPatterns:
 			if pattern.rePattern.search(line):
 				self.comments.append(Comment(pattern.pattern, file, pos,
@@ -215,11 +229,6 @@ class CommentsSearch:
 ####
 
 def parseCommandLineArguments():
-	patterns = ['TODO', 'FIXME']
-	suppressed = ['.git', '.svn', 'CVS']
-	directories = ['.']
-	numLines = 1
-
 	parser = argparse.ArgumentParser(
 			prog='todos',
 			description='Search project directory for TODO, FIXME and similar comments.',
@@ -238,6 +247,14 @@ def parseCommandLineArguments():
 			default=False)
 
 	parser.add_argument(
+			'-c', '--comment',
+			nargs='+',
+			help='the comment characters',
+			metavar='COMMENT',
+			dest='comments',
+			default=COMMENTS)
+
+	parser.add_argument(
 			'-e', '--regexp',
 			nargs='+',
 			help='the pattern to search',
@@ -251,7 +268,7 @@ def parseCommandLineArguments():
 			metavar='NUM',
 			dest='numLines',
 			help='print %(metavar)s lines of trailing context after matching line',
-			default=numLines)
+			default=NUM_LINES)
 
 	parser.add_argument(
 			'-f', '--file-ext',
