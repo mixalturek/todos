@@ -41,15 +41,24 @@ DIRECTORIES = ['.']
 ####
 
 class Comment:
-	def __init__(self, pattern, file, pos, line):
-		self.__pattern = pattern
-		self.__file = file
-		self.__pos = pos
-		self.__line = line.strip()
-
+	def __init__(self, pattern, file, pos, lines):
+		self.pattern = pattern
+		self.file = file
+		self.pos = pos
+		self.lines = lines
 
 	def __str__(self):
-		return self.__file + ':' + str(self.__pos) + ': ' + self.__line
+		fileLine = self.file + ':' + str(self.pos) + ': '
+
+		if len(self.lines) == 1:
+			return fileLine + self.lines[0]
+		else:
+			result = ""
+
+			for line in self.lines:
+				result += fileLine + line
+
+			return result
 
 
 ###############################################################################
@@ -88,6 +97,7 @@ class CommentsSearch:
 		self.verbose('extensions: ' + str(self.__parameters.extensions))
 		self.verbose('suppressed-dirs: ' + str(self.__parameters.suppressed))
 		self.verbose('ignore-case: ' + str(self.__parameters.ignoreCase))
+		self.verbose('num-lines: ' + str(self.__parameters.numLines))
 		self.verbose('txt: ' + str(self.__parameters.txt))
 		self.verbose('xml: ' + str(self.__parameters.xml))
 		self.verbose('html: ' + str(self.__parameters.html))
@@ -168,23 +178,38 @@ class CommentsSearch:
 
 			pos = 0
 			for line in lines:
-				++pos
-				self.processLine(file, pos, line)
+				pos += 1
+				self.processLine(file, pos, line, lines)
 		except UnicodeError:
 			self.verbose('Skipping file (unicode error): ' + file)
 
 
-	def processLine(self, file, pos, line):
+	def processLine(self, file, pos, line, lines):
 		for pattern in self.__parameters.compiledPatterns:
 			if pattern.rePattern.search(line):
-				self.__comments.append(Comment(pattern.pattern, file, pos, line))
+				self.__comments.append(Comment(pattern.pattern, file, pos,
+						self.getLines(lines, pos-1, self.__parameters.numLines)))
 				break
+
+
+	def getLines(self, lines, pos, num):
+		lastLine = pos+num
+		if lastLine >= len(lines):
+			lastLine = len(lines)
+
+		result = []
+		for i in range(pos, lastLine):
+			result.append(lines[i])
+
+		return result
 
 
 	# TODO: debug
 	def dumpComments(self):
 		for comment in self.__comments:
-			print(str(comment))
+			print(str(comment).rstrip())
+			if self.__parameters.numLines > 1:
+				print '--'
 
 
 ###############################################################################
@@ -194,6 +219,7 @@ def parseCommandLineArguments():
 	patterns = ['TODO', 'FIXME']
 	suppressed = ['.git', '.svn', 'CVS']
 	directories = ['.']
+	numLines = 1
 
 	parser = argparse.ArgumentParser(
 			prog='todos',
@@ -216,9 +242,17 @@ def parseCommandLineArguments():
 			'-e', '--regexp',
 			nargs='+',
 			help='the pattern to search',
-			metavar='pattern',
+			metavar='PATTERN',
 			dest='patterns',
 			default=PATTERNS)
+
+	parser.add_argument(
+			'-A', '--after-context',
+			type=int,
+			metavar='NUM',
+			dest='numLines',
+			help='print %(metavar)s lines of trailing context after matching line',
+			default=numLines)
 
 	parser.add_argument(
 			'-f', '--file-ext',
