@@ -79,32 +79,32 @@ class Pattern:
 
 class CommentsSearch:
 	def __init__(self, parameters):
-		self.__parameters = parameters
-		self.__comments = []
+		self.parameters = parameters
+		self.comments = []
 
-		if self.__parameters.extensions is not None:
-			self.__parameters.extensions = ['.' + e for e in self.__parameters.extensions]
+		if self.parameters.extensions is not None:
+			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
 
-		if self.__parameters.ignoreCase:
-			self.__parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern, re.IGNORECASE))
-					for pattern in self.__parameters.patterns]
+		if self.parameters.ignoreCase:
+			self.parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern, re.IGNORECASE))
+					for pattern in self.parameters.patterns]
 		else:
-			self.__parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern))
-					for pattern in self.__parameters.patterns]
+			self.parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern))
+					for pattern in self.parameters.patterns]
 
 
 	def dumpConfiguration(self):
 		self.verbose('Command line arguments:')
-		self.verbose('verbose: ' + str(self.__parameters.verbose))
-		self.verbose('patterns: ' + str(self.__parameters.patterns))
-		self.verbose('extensions: ' + str(self.__parameters.extensions))
-		self.verbose('suppressed-dirs: ' + str(self.__parameters.suppressed))
-		self.verbose('ignore-case: ' + str(self.__parameters.ignoreCase))
-		self.verbose('num-lines: ' + str(self.__parameters.numLines))
-		self.verbose('txt: ' + str(self.__parameters.txt))
-		self.verbose('xml: ' + str(self.__parameters.xml))
-		self.verbose('html: ' + str(self.__parameters.html))
-		self.verbose('directories: ' + str(self.__parameters.directories))
+		self.verbose('verbose: ' + str(self.parameters.verbose))
+		self.verbose('patterns: ' + str(self.parameters.patterns))
+		self.verbose('extensions: ' + str(self.parameters.extensions))
+		self.verbose('suppressed-dirs: ' + str(self.parameters.suppressed))
+		self.verbose('ignore-case: ' + str(self.parameters.ignoreCase))
+		self.verbose('num-lines: ' + str(self.parameters.numLines))
+		self.verbose('txt: ' + str(self.parameters.txt))
+		self.verbose('xml: ' + str(self.parameters.xml))
+		self.verbose('html: ' + str(self.parameters.html))
+		self.verbose('directories: ' + str(self.parameters.directories))
 		self.verbose('')
 
 
@@ -113,20 +113,20 @@ class CommentsSearch:
 
 
 	def verbose(self, message):
-		if self.__parameters.verbose:
+		if self.parameters.verbose:
 			print(message)
 
 
 	def processDirectories(self):
-		for directory in self.__parameters.directories:
+		for directory in self.parameters.directories:
 			self.processDirectory(directory, directory)
 
 
 	def isDirectorySuppressed(self, directory, dirName):
-		if self.__parameters.suppressed is None:
+		if self.parameters.suppressed is None:
 			return False
 
-		return dirName in self.__parameters.suppressed
+		return dirName in self.parameters.suppressed
 
 
 	def processDirectory(self, directory, dirName):
@@ -154,10 +154,10 @@ class CommentsSearch:
 
 
 	def isFileExtensionAllowed(self, file):
-		if self.__parameters.extensions is None:
+		if self.parameters.extensions is None:
 			return True
 
-		for extension in self.__parameters.extensions:
+		for extension in self.parameters.extensions:
 			if file.endswith(extension):
 				return True
 
@@ -184,10 +184,10 @@ class CommentsSearch:
 
 
 	def processLine(self, file, pos, line, lines):
-		for pattern in self.__parameters.compiledPatterns:
+		for pattern in self.parameters.compiledPatterns:
 			if pattern.rePattern.search(line):
-				self.__comments.append(Comment(pattern.pattern, file, pos,
-						self.getLines(lines, pos-1, self.__parameters.numLines)))
+				self.comments.append(Comment(pattern.pattern, file, pos,
+						self.getLines(lines, pos-1, self.parameters.numLines)))
 				break
 
 
@@ -205,9 +205,9 @@ class CommentsSearch:
 
 	# TODO: debug
 	def dumpComments(self):
-		for comment in self.__comments:
+		for comment in self.comments:
 			print(str(comment).rstrip())
-			if self.__parameters.numLines > 1:
+			if self.parameters.numLines > 1:
 				print '--'
 
 
