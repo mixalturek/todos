@@ -55,10 +55,30 @@ class Comment:
 ###############################################################################
 ####
 
+class Pattern:
+	def __init__(self, pattern, rePattern):
+		self.pattern = pattern
+		self.rePattern = rePattern
+
+
+	def __str__(self):
+		return self.pattern
+
+
+###############################################################################
+####
+
 class CommentsSearch:
 	def __init__(self, parameters):
 		self.__parameters = parameters
 		self.__comments = []
+
+		if self.__parameters.ignoreCase:
+			self.__parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern, re.IGNORECASE))
+					for pattern in self.__parameters.patterns]
+		else:
+			self.__parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern))
+					for pattern in self.__parameters.patterns]
 
 
 	def dumpConfiguration(self):
@@ -67,6 +87,7 @@ class CommentsSearch:
 		self.verbose('patterns: ' + str(self.__parameters.patterns))
 		self.verbose('extensions: ' + str(self.__parameters.extensions))
 		self.verbose('suppressed-dirs: ' + str(self.__parameters.suppressed))
+		self.verbose('ignore-case: ' + str(self.__parameters.ignoreCase))
 		self.verbose('txt: ' + str(self.__parameters.txt))
 		self.verbose('xml: ' + str(self.__parameters.xml))
 		self.verbose('html: ' + str(self.__parameters.html))
@@ -154,10 +175,9 @@ class CommentsSearch:
 
 
 	def processLine(self, file, pos, line):
-		for pattern in self.__parameters.patterns:
-			# TODO: ignore case
-			if re.search(pattern, line):
-				self.__comments.append(Comment(pattern, file, pos, line))
+		for pattern in self.__parameters.compiledPatterns:
+			if pattern.rePattern.search(line):
+				self.__comments.append(Comment(pattern.pattern, file, pos, line))
 				break
 
 
@@ -190,7 +210,7 @@ def parseCommandLineArguments():
 			'-v', '--verbose',
 			help='increase output verbosity',
 			action='store_true',
-			default=0)
+			default=False)
 
 	parser.add_argument(
 			'-p', '--pattern',
@@ -212,6 +232,13 @@ def parseCommandLineArguments():
 			nargs='+',
 			help='suppress the specified directory',
 			default=SUPPRESSED)
+
+	parser.add_argument(
+			'-i', '--ignore-case',
+			action='store_true',
+			help='ignore case distinctions',
+			dest='ignoreCase',
+			default=False)
 
 	parser.add_argument(
 			'-t', '--txt',
