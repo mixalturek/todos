@@ -82,6 +82,9 @@ class CommentsSearch:
 		self.__parameters = parameters
 		self.__comments = []
 
+		if self.__parameters.extensions is not None:
+			self.__parameters.extensions = ['.' + e for e in self.__parameters.extensions]
+
 		if self.__parameters.ignoreCase:
 			self.__parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern, re.IGNORECASE))
 					for pattern in self.__parameters.patterns]
@@ -116,21 +119,17 @@ class CommentsSearch:
 
 	def processDirectories(self):
 		for directory in self.__parameters.directories:
-			self.processDirectory(directory)
+			self.processDirectory(directory, directory)
 
 
-	def isDirectorySuppressed(self, directory):
+	def isDirectorySuppressed(self, directory, dirName):
 		if self.__parameters.suppressed is None:
 			return False
 
-		for suppressed in self.__parameters.suppressed:
-			if directory.endswith(suppressed):
-				return True
-
-		return False
+		return dirName in self.__parameters.suppressed
 
 
-	def processDirectory(self, directory):
+	def processDirectory(self, directory, dirName):
 		'''
 		Recursively search files in specified directories.
 
@@ -141,7 +140,7 @@ class CommentsSearch:
 			self.verbose('Skipping directory (not a directory): ' + directory)
 			return
 
-		if self.isDirectorySuppressed(directory):
+		if self.isDirectorySuppressed(directory, dirName):
 			self.verbose('Skipping directory (suppressed): ' + directory)
 			return
 
@@ -151,7 +150,7 @@ class CommentsSearch:
 			if os.path.isfile(path):
 				self.processFile(path)
 			else:
-				self.processDirectory(path)
+				self.processDirectory(path, item)
 
 
 	def isFileExtensionAllowed(self, file):
