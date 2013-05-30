@@ -33,7 +33,7 @@ import re
 VERSION = '0.1.0'
 
 COMMENTS = ['#', '//', '/*']
-PATTERNS = ['TODO', 'FIXME']
+PATTERNS = [r'\bTODO\b', r'\bFIXME\b']
 SUPPRESSED = ['.git', '.svn', 'CVS']
 DIRECTORIES = ['.']
 NUM_LINES = 1
@@ -261,7 +261,7 @@ def parseCommandLineArguments():
 	parser.add_argument(
 			'-e', '--regexp',
 			nargs='+',
-			help='the pattern to search',
+			help="the pattern to search; see Python's re module for proper syntax",
 			metavar='PATTERN',
 			dest='patterns',
 			default=PATTERNS)
