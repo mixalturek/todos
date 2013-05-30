@@ -87,12 +87,16 @@ class CommentsSearch:
 		if self.parameters.extensions is not None:
 			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
 
+		flags = 0
 		if self.parameters.ignoreCase:
-			self.parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern, re.IGNORECASE))
-					for pattern in self.parameters.patterns]
-		else:
-			self.parameters.compiledPatterns = [Pattern(pattern, re.compile(pattern))
-					for pattern in self.parameters.patterns]
+			flags = re.IGNORECASE
+
+		self.parameters.compiledPatterns = []
+		for pattern in self.parameters.patterns:
+			try:
+				self.parameters.compiledPatterns.append(Pattern(pattern, re.compile(pattern, flags)))
+			except re.error as e:
+				print >> sys.stderr, 'Pattern compilation failed:', pattern + ',', e
 
 
 	def dumpConfiguration(self):
@@ -117,7 +121,7 @@ class CommentsSearch:
 
 	def verbose(self, message):
 		if self.parameters.verbose:
-			print(message)
+			print message
 
 
 	def processDirectories(self):
@@ -267,7 +271,7 @@ def parseCommandLineArguments():
 			type=int,
 			metavar='NUM',
 			dest='numLines',
-			help='print %(metavar)s lines of trailing context after matching line',
+			help='number of lines that are sent to the output together with the matching line',
 			default=NUM_LINES)
 
 	parser.add_argument(
