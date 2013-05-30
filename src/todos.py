@@ -49,19 +49,6 @@ class Comment:
 		self.pos = pos
 		self.lines = lines
 
-	def __str__(self):
-		fileLine = self.file + ':' + str(self.pos) + ': '
-
-		if len(self.lines) == 1:
-			return fileLine + self.lines[0]
-		else:
-			result = ""
-
-			for line in self.lines:
-				result += fileLine + line
-
-			return result
-
 
 ###############################################################################
 ####
@@ -108,9 +95,10 @@ class CommentsSearch:
 		self.verbose('suppressed-dirs: ' + str(self.parameters.suppressed))
 		self.verbose('ignore-case: ' + str(self.parameters.ignoreCase))
 		self.verbose('num-lines: ' + str(self.parameters.numLines))
-		self.verbose('txt: ' + str(self.parameters.txt))
-		self.verbose('xml: ' + str(self.parameters.xml))
-		self.verbose('html: ' + str(self.parameters.html))
+		self.verbose('out-txt: ' + str(self.parameters.outTxt))
+		self.verbose('out-xml: ' + str(self.parameters.outXml))
+		self.verbose('out-html: ' + str(self.parameters.outHtml))
+		self.verbose('force: ' + str(self.parameters.force))
 		self.verbose('directories: ' + str(self.parameters.directories))
 		self.verbose('')
 
@@ -216,17 +204,69 @@ class CommentsSearch:
 
 		result = []
 		for i in range(pos, lastLine):
-			result.append(lines[i])
+			result.append(lines[i].rstrip())
 
 		return result
 
 
-	# TODO: debug
-	def dumpComments(self):
+	def output(self):
+		self.writeTxt()
+		self.writeXml()
+		self.writeHtml()
+
+
+	def writeTxt(self):
+		if self.parameters.outTxt is None:
+			return
+
+		self.verbose('Writing TXT output: ' + self.parameters.outTxt)
+
+		if self.parameters.outTxt == 'stdout':
+			outFile = sys.stdout
+		else:
+			if os.path.exists(self.parameters.outTxt) and not self.parameters.force:
+				print >> sys.stderr, 'File exists, use force parameter to override:', self.parameters.outTxt
+				return
+
+			try:
+				outFile = open(self.parameters.outTxt, 'w')
+			except IOError, e:
+				print >> sys.stderr, 'Opening file failed:', e
+				return
+
+		if self.parameters.numLines > 1:
+			print >> outFile, '--'
+
 		for comment in self.comments:
-			print(str(comment).rstrip())
+			pos = comment.pos
+
+			for line in comment.lines:
+				print >> outFile,  comment.file + ':' + str(pos), line
+				pos += 1
+
 			if self.parameters.numLines > 1:
-				print '--'
+				print >> outFile, '--'
+
+		if self.parameters.outTxt != 'stdout':
+			outFile.close()
+
+
+	def writeXml(self):
+		if self.parameters.outXml is None:
+			return
+
+		self.verbose('Writing XML output: ' + self.parameters.outXml)
+		# FIXME: add implementation
+		pass
+
+
+	def writeHtml(self):
+		if self.parameters.outHtml is None:
+			return
+
+		self.verbose('Writing HTML output: ' + self.parameters.outHtml)
+		# FIXME: add implementation
+		pass
 
 
 ###############################################################################
@@ -275,7 +315,7 @@ def parseCommandLineArguments():
 			default=NUM_LINES)
 
 	parser.add_argument(
-			'-f', '--file-ext',
+			'-t', '--file-ext',
 			metavar='EXT',
 			nargs='+',
 			help='check only files with the specified extension',
@@ -296,19 +336,30 @@ def parseCommandLineArguments():
 			default=False)
 
 	parser.add_argument(
-			'-t', '--txt',
+			'-o', '--out-txt',
 			nargs='?',
+			const='stdout',
+			metavar='TXT',
+			dest='outTxt',
 			help='the output text file; standard output will be used if the path is not specified')
 
 	parser.add_argument(
-			'-x', '--xml',
-			nargs=1,
+			'-x', '--out-xml',
+			metavar='XML',
+			dest='outXml',
 			help='the output XML file')
 
 	parser.add_argument(
-			'-m', '--html',
-			nargs=1,
+			'-m', '--out-html',
+			metavar='HTML',
+			dest='outHtml',
 			help='the output HTML file')
+
+	parser.add_argument(
+			'-f', '--force',
+			action='store_true',
+			default=False,
+			help='override existing output files')
 
 	parser.add_argument(
 			'directory',
@@ -333,9 +384,7 @@ def main():
 	commentsSearch = CommentsSearch(parseCommandLineArguments())
 	commentsSearch.dumpConfiguration()
 	commentsSearch.search()
-
-	# TODO: debug
-	commentsSearch.dumpComments()
+	commentsSearch.output()
 
 
 ###############################################################################
