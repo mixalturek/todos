@@ -39,6 +39,22 @@ DIRECTORIES = ['.']
 NUM_LINES = 1
 
 
+XML_HEADER = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Todos>
+	<Version version="{0}">
+	<Comments>'''.format(VERSION)
+
+XML_COMMENT='''
+		<Comment pattern="{0}" file="{1}" line="{2}">
+			{3}
+		</Comment>
+'''
+
+XML_FOOTER = '''	</Comments>
+</Todos>
+'''
+
+
 ###############################################################################
 ####
 
@@ -231,7 +247,7 @@ class CommentsSearch:
 			try:
 				outFile = open(self.parameters.outTxt, 'w')
 			except IOError, e:
-				print >> sys.stderr, 'Opening file failed:', e
+				print >> sys.stderr, 'File opening failed:', e
 				return
 
 		if self.parameters.numLines > 1:
@@ -241,7 +257,7 @@ class CommentsSearch:
 			pos = comment.pos
 
 			for line in comment.lines:
-				print >> outFile,  comment.file + ':' + str(pos), line
+				print >> outFile, comment.file + ':' + str(pos), line
 				pos += 1
 
 			if self.parameters.numLines > 1:
@@ -251,13 +267,42 @@ class CommentsSearch:
 			outFile.close()
 
 
+	def xmlSpecialChars(self, text):
+		ret = text
+		ret = ret.replace('&', '&amp;')
+		ret = ret.replace('"', '&quot;')
+		ret = ret.replace('<', '&lt;')
+		ret = ret.replace('>', '&gt;')
+		return ret
+
+
 	def writeXml(self):
 		if self.parameters.outXml is None:
 			return
 
 		self.verbose('Writing XML output: ' + self.parameters.outXml)
-		# FIXME: add implementation
-		pass
+
+		if os.path.exists(self.parameters.outXml) and not self.parameters.force:
+			print >> sys.stderr, 'File exists, use force parameter to override:', self.parameters.outXml
+			return
+
+		try:
+			outFile = open(self.parameters.outXml, 'w')
+		except IOError, e:
+			print >> sys.stderr, 'File opening failed:', e
+			return
+
+		print >> outFile, XML_HEADER
+
+		for comment in self.comments:
+			print >> outFile, XML_COMMENT.format(
+					 self.xmlSpecialChars(comment.pattern),
+					 self.xmlSpecialChars(comment.file),
+					 comment.pos,
+					 self.xmlSpecialChars('\n\t\t\t'.join(comment.lines)))
+
+		print >> outFile, XML_FOOTER
+		outFile.close()
 
 
 	def writeHtml(self):
