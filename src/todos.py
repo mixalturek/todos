@@ -25,6 +25,7 @@ import os
 import os.path
 import sys
 import re
+from time import localtime, strftime
 
 
 ###############################################################################
@@ -167,11 +168,9 @@ class HtmlFormatter:
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta http-equiv="content-language" content="en" />
 
-<title>Comments - todos</title>
+<title>Comments Report - todos</title>
 
 <style type="text/css" media="all">
-* { margin: 0; padding: 0; }
-
 body
 {
 	margin: 2em; padding: 0px;
@@ -189,18 +188,21 @@ th, td      { vertical-align: top; padding: 0.2em 0.5em 0.2em 0.5em; }
 tr          { background-color: #D0D0EE; }
 tr:hover    { background-color: #C0C0FF; }
 
-#footer     { font-size: 9pt; margin-top: 3em; border-top: 1px solid silver; color: gray; }
+#footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver; color: gray; }
 </style>
 
 </head>
 
 <body>
 
-<h1>Comments</h1>
+<h1>Comments Report</h1>
 '''
 
 
 	def writeComments(self, outStream, comments):
+		print >> outStream, '<h2>Comments</h2>'
+		print >> outStream
+
 		print >> outStream, '<table>'
 		print >> outStream, '<thead>'
 		print >> outStream, '<tr>'
@@ -227,10 +229,11 @@ tr:hover    { background-color: #C0C0FF; }
 
 		print >> outStream, '</tbody>'
 		print >> outStream, '</table>'
+		print >> outStream
 
 
 	def writeFooter(self, outStream):
-		print >> outStream, '<p id="footer">This page was generated using <a href="http://todos.sourceforge.net/">todos</a> tool.</p>'
+		print >> outStream, '<p id="footer">Page generated: {0}, <a href="http://todos.sourceforge.net/">todos</a>  {1}.</p>'.format(strftime("%Y-%m-%d %H:%M:%S", localtime()), TODOS_VERSION)
 		print >> outStream, '</body>'
 		print >> outStream, '</html>'
 
