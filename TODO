@@ -2,7 +2,7 @@ Common
 	File headers, license.
 
 Web
-	egrep -riI '(TODO|FIXME)' .
+	grep -rIn 'TODO' .
 
 Similar projects
 	http://search.cpan.org/~mthurn/Devel-Todo-Find-1.012/lib/Devel/Todo/Find.pm
