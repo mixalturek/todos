@@ -450,6 +450,27 @@ class CommentsSearch:
 ###############################################################################
 ####
 
+class Summary:
+	def __init__(self, parameters, comments):
+		self.perPatterns = {}
+		self.perFiles = {}
+
+		for pattern in parameters.patterns:
+			self.perPatterns[pattern] = 0
+
+		for comment in comments:
+			self.perPatterns[comment.pattern] += 1
+
+		for comment in comments:
+			if comment.file in self.perFiles:
+				self.perFiles[comment.file] += 1
+			else:
+				self.perFiles[comment.file] = 1
+
+
+###############################################################################
+####
+
 def parseCommandLineArguments():
 	parser = argparse.ArgumentParser(
 			prog='todos',
@@ -561,6 +582,8 @@ def main():
 	commentsSearch.dumpConfiguration()
 	commentsSearch.search()
 	commentsSearch.output()
+
+	summary = Summary(commentsSearch.parameters, commentsSearch.comments)
 
 
 ###############################################################################
