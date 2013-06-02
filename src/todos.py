@@ -200,36 +200,19 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeComments(self, outStream, comments):
-		print >> outStream, '<h2>Comments</h2>'
-		print >> outStream
+		print >> outStream, '<h2>Comments</h2>\n'
 
-		print >> outStream, '<table>'
-		print >> outStream, '<thead>'
-		print >> outStream, '<tr>'
-		print >> outStream, '<th>File</th>'
-		print >> outStream, '<th>Line</th>'
-		print >> outStream, '<th>Pattern</th>'
-		print >> outStream, '<th>Content</th>'
-		print >> outStream, '</tr>'
-		print >> outStream, '</thead>'
-		print >> outStream, '<tbody>'
-		print >> outStream
+		headers = ['File', 'Line', 'Pattern', 'Content']
+		rows = []
 
 		for comment in comments:
-			print >> outStream, '<tr>'
-			print >> outStream, '<td><a href="{0}">{0}</a></td>'.format(self.htmlSpecialChars(comment.file))
-			print >> outStream, '<td>{0}</td>'.format(comment.pos)
-			print >> outStream, '<td>{0}</td>'.format(self.htmlSpecialChars(comment.pattern))
-			print >> outStream, '<td><pre>'
-			for line in comment.lines:
-				print >> outStream, '{0}'.format(self.htmlSpecialChars(line))
-			print >> outStream, '</pre></td>'
-			print >> outStream, '</tr>'
-			print >> outStream
+			# FIXME: link should be relative to the output directory
+			file = '<a href="{0}">{0}</a>'.format(self.htmlSpecialChars(comment.file))
+			pattern = self.htmlSpecialChars(comment.pattern)
+			content = '<pre>{0}</pre>'.format(self.htmlSpecialChars('\n'.join(comment.lines)))
+			rows.append([file, comment.pos, pattern, content])
 
-		print >> outStream, '</tbody>'
-		print >> outStream, '</table>'
-		print >> outStream
+		self.showTable(outStream, headers, rows)
 
 
 	def writeFooter(self, outStream):
@@ -245,6 +228,26 @@ tr:hover    { background-color: #C0C0FF; }
 		ret = ret.replace('<', '&lt;')
 		ret = ret.replace('>', '&gt;')
 		return ret
+
+
+	def showTable(self, outStream, headers, rows):
+		print >> outStream, '<table>\n<thead>\n<tr>'
+
+		for header in headers:
+			print >> outStream, '<th>{0}</th>'.format(header)
+
+		print >> outStream, '</tr>\n</thead>\n\n<tbody>\n'
+
+		for row in rows:
+			print >> outStream, '<tr>'
+
+			for item in row:
+				print >> outStream, '<td>{0}</td>'.format(item)
+
+			print >> outStream, '</tr>\n'
+
+
+		print >> outStream, '</tbody>\n</table>\n'
 
 
 ###############################################################################
