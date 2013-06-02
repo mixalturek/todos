@@ -263,10 +263,23 @@ class Pattern:
 ###############################################################################
 ####
 
+class Summary:
+	def __init__(self, parameters):
+		self.perPattern = {}
+		self.perFile = {}
+
+		for pattern in parameters.patterns:
+			self.perPattern[pattern] = 0
+
+
+###############################################################################
+####
+
 class CommentsSearch:
 	def __init__(self, parameters):
 		self.parameters = parameters
 		self.comments = []
+		self.summary = Summary(parameters)
 
 		if self.parameters.extensions is not None:
 			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
@@ -367,6 +380,8 @@ class CommentsSearch:
 			with open(file, 'r') as f:
 				lines = f.readlines()
 
+			self.summary.perFile[file] = 0
+
 			pos = 0
 			for line in lines:
 				pos += 1
@@ -391,6 +406,8 @@ class CommentsSearch:
 			if pattern.rePattern.search(line):
 				self.comments.append(Comment(pattern.pattern, file, pos,
 						self.getLines(lines, pos-1, self.parameters.numLines)))
+				self.summary.perPattern[pattern.pattern] += 1
+				self.summary.perFile[file] += 1
 				break
 
 
@@ -445,27 +462,6 @@ class CommentsSearch:
 		except IOError, e:
 			print >> sys.stderr, 'Output failed:', e
 			return
-
-
-###############################################################################
-####
-
-class Summary:
-	def __init__(self, parameters, comments):
-		self.perPatterns = {}
-		self.perFiles = {}
-
-		for pattern in parameters.patterns:
-			self.perPatterns[pattern] = 0
-
-		for comment in comments:
-			self.perPatterns[comment.pattern] += 1
-
-		for comment in comments:
-			if comment.file in self.perFiles:
-				self.perFiles[comment.file] += 1
-			else:
-				self.perFiles[comment.file] = 1
 
 
 ###############################################################################
@@ -582,8 +578,6 @@ def main():
 	commentsSearch.dumpConfiguration()
 	commentsSearch.search()
 	commentsSearch.output()
-
-	summary = Summary(commentsSearch.parameters, commentsSearch.comments)
 
 
 ###############################################################################
