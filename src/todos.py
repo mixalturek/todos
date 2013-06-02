@@ -26,6 +26,7 @@ import os.path
 import sys
 import re
 from time import localtime, strftime
+from operator import itemgetter
 
 
 ###############################################################################
@@ -74,7 +75,7 @@ class TxtFormatter:
 		pass
 
 
-	def writeComments(self, outStream, comments):
+	def writeData(self, outStream, comments, summary):
 		if self.multiline:
 			print >> outStream, self.MULTILINE_DELIMITER
 
@@ -116,7 +117,7 @@ class XmlFormatter:
 		print >> outStream, '\t<Comments>'
 
 
-	def writeComments(self, outStream, comments):
+	def writeData(self, outStream, comments, summary):
 		for comment in comments:
 			print >> outStream, '\t\t<Comment pattern="{0}" file="{1}" line="{2}">'.format(
 					self.xmlSpecialChars(comment.pattern),
@@ -145,8 +146,6 @@ class XmlFormatter:
 
 ###############################################################################
 ####
-
-# TODO: summary in HTML
 
 class HtmlFormatter:
 	def __init__(self):
@@ -183,7 +182,7 @@ pre         { line-height: 1.1em; margin: 0; margin: 0.2em 0 0.2em 0; }
 a:hover     { color: blue; }
 
 table       { margin-top: 1.5em; max-width: 100%; }
-th          { background-color: #AFB3CC; }
+th          { background-color: #AFB3CC; text-align: left; }
 th, td      { vertical-align: top; padding: 0.2em 0.5em 0.2em 0.5em; }
 tr          { background-color: #D0D0EE; }
 tr:hover    { background-color: #C0C0FF; }
@@ -199,20 +198,50 @@ tr:hover    { background-color: #C0C0FF; }
 '''
 
 
-	def writeComments(self, outStream, comments):
-		print >> outStream, '<h2>Comments</h2>\n'
+	def writeData(self, outStream, comments, summary):
+		# TODO: Table of content
 
-		headers = ['File', 'Line', 'Pattern', 'Content']
+		print >> outStream, '<h2>Summary</h2>\n'
+
+		print >> outStream, '<h3>Per Patterns</h3>\n'
+		self.writePerPattern(outStream, summary.perPattern)
+
+		print >> outStream, '<h3>Per Files</h3>\n'
+		self.writePerFile(outStream, summary.perFile)
+
+		print >> outStream, '<h2>Comments</h2>\n'
+		self.writeComments(outStream, comments)
+
+
+	def writePerPattern(self, outStream, perPattern):
+		rows = [[self.htmlSpecialChars(p), c] for p, c in perPattern.iteritems()]
+		rows.sort(key=itemgetter(1), reverse=True)
+		self.htmlTable(outStream, ['Pattern', 'Occurrences'], rows)
+
+
+	def writePerFile(self, outStream, perFile):
+		rows = []
+
+		for file, count in perFile.iteritems():
+			if count != 0:
+				# FIXME: The link should be relative to the output directory
+				rows.append(['<a href="{0}">{0}</a>'.format(self.htmlSpecialChars(file)), count])
+
+		rows.sort(key=itemgetter(1), reverse=True)
+		self.htmlTable(outStream, ['File', 'Occurrences'], rows)
+
+
+	def writeComments(self, outStream, comments):
 		rows = []
 
 		for comment in comments:
-			# FIXME: link should be relative to the output directory
-			file = '<a href="{0}">{0}</a>'.format(self.htmlSpecialChars(comment.file))
+			# FIXME: The link should be relative to the output directory
+			file = self.htmlLink(comment.file)
 			pattern = self.htmlSpecialChars(comment.pattern)
 			content = '<pre>{0}</pre>'.format(self.htmlSpecialChars('\n'.join(comment.lines)))
 			rows.append([file, comment.pos, pattern, content])
 
-		self.showTable(outStream, headers, rows)
+		self.htmlTable(outStream, ['File', 'Line', 'Pattern', 'Content'], rows)
 
 
 	def writeFooter(self, outStream):
@@ -230,7 +259,11 @@ tr:hover    { background-color: #C0C0FF; }
 		return ret
 
 
-	def showTable(self, outStream, headers, rows):
+	def htmlLink(self, destination):
+		return '<a href="{0}">{0}</a>'.format(self.htmlSpecialChars(destination))
+
+
+	def htmlTable(self, outStream, headers, rows):
 		print >> outStream, '<table>\n<thead>\n<tr>'
 
 		for header in headers:
@@ -448,7 +481,7 @@ class CommentsSearch:
 
 	def outputData(self, outStream, formatter):
 		formatter.writeHeader(outStream)
-		formatter.writeComments(outStream, self.comments)
+		formatter.writeData(outStream, self.comments, self.summary)
 		formatter.writeFooter(outStream)
 
 
