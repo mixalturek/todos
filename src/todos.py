@@ -443,9 +443,34 @@ class CommentsSearch:
 		return False
 
 
+	def isFileBinary(self, file):
+		CHUNK_SIZE = 1024
+
+		try:
+			with open(file, 'rb') as f:
+				chunk = f.read(CHUNK_SIZE)
+		except IOError as e:
+			print >> sys.stderr, 'Reading from file failed:', e
+			return True
+
+		# If the begin of the file contains a null byte, guess that the file is binary.
+		# GNU grep works similarly, see file_is_binary() in its source codes.
+		#
+		# The following works nicely for common ascii/utf8 encoded source codes
+		# with binary object files, images and jar packages in the same directory tree.
+		# The heuristic can be extended in future if needed,
+		#
+		# Note UTF-16 encoded text files will be clasified as binary, is it correct/incorrect?
+		return '\0' in chunk
+
+
 	def processFile(self, file):
 		if not self.isFileExtensionAllowed(file):
 			self.verbose('Skipping file (file extension): ' + file)
+			return
+
+		if self.isFileBinary(file):
+			self.verbose('Skipping file (binary file): ' + file)
 			return
 
 		self.verbose('Parsing file: ' + file)
@@ -461,7 +486,9 @@ class CommentsSearch:
 			for line in lines:
 				pos += 1
 				self.processLine(file, pos, line, lines)
-		except UnicodeError:
+		except IOError as e:
+			print >> sys.stderr, 'Reading from file failed:', e
+		except UnicodeError as e:
 			self.verbose('Skipping file (unicode error): ' + file)
 
 
@@ -534,7 +561,7 @@ class CommentsSearch:
 		try:
 			with open(path, 'w') as outStream:
 				self.outputData(outStream, formatter)
-		except IOError, e:
+		except IOError as e:
 			print >> sys.stderr, 'Output failed:', e
 			return
 
@@ -661,5 +688,5 @@ def main():
 if __name__ == '__main__':
 	try:
 		main()
-	except KeyboardInterrupt:
+	except KeyboardInterrupt as e:
 		sys.exit('\nERROR: Interrupted by user')

@@ -1,6 +1,5 @@
 Common
 	File headers, license.
-	Detect and skip binary files.
 
 Web
 	grep -rIn 'TODO' .
