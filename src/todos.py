@@ -199,18 +199,51 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeData(self, outStream, comments, summary):
-		# TODO: Table of content
+		print >> outStream, '<h2 id="toc">Table of Contents</h2>\n'
+		self.writeToc(outStream)
 
-		print >> outStream, '<h2>Summary</h2>\n'
+		print >> outStream, '<h2 id="summary">Summary</h2>\n'
 
-		print >> outStream, '<h3>Per Patterns</h3>\n'
+		print >> outStream, '<h3 id="general">General</h3>\n'
+		self.writeGeneralSummary(outStream, summary)
+
+		print >> outStream, '<h3 id="perPatterns">Per Patterns</h3>\n'
 		self.writePerPattern(outStream, summary.perPattern)
 
-		print >> outStream, '<h3>Per Files</h3>\n'
+		print >> outStream, '<h3 id="perFiles">Per Files</h3>\n'
 		self.writePerFile(outStream, summary.perFile)
 
-		print >> outStream, '<h2>Comments</h2>\n'
+		print >> outStream, '<h2 id="details">Details</h2>\n'
 		self.writeComments(outStream, comments)
+
+
+	def writeToc(self, outStream):
+		print >> outStream, '''
+<ul>
+<li><a href="#toc">Table of Contents</a></li>
+<li><a href="#summary">Summary</a>
+	<ul>
+	<li><a href="#general">General</a></li>
+	<li><a href="#perPatterns">Per Patterns</a></li>
+	<li><a href="#perFiles">Per Files</a></li>
+	</ul>
+</li>
+<li><a href="#details">Details</a></li>
+</ul>
+'''
+
+
+	def writeGeneralSummary(self, outStream, summary):
+		numFilesWithMatches = 0
+		for file, count in summary.perFile.iteritems():
+			if count != 0:
+				numFilesWithMatches += 1
+
+		rows = [['Searched Patterns', len(summary.perPattern)],
+				['Files with Matches', numFilesWithMatches],
+				['Total Files', summary.totalFiles],
+				['Total Directories', summary.totalDirectories]]
+		self.htmlTable(outStream, ['Parameter', 'Value'], rows)
 
 
 	def writePerPattern(self, outStream, perPattern):
@@ -301,6 +334,9 @@ class Pattern:
 
 class Summary:
 	def __init__(self, parameters):
+		self.totalFiles = 0
+		self.totalDirectories = 0
+
 		self.perPattern = {}
 		self.perFile = {}
 
@@ -385,6 +421,8 @@ class CommentsSearch:
 			self.verbose('Skipping directory (suppressed): ' + directory)
 			return
 
+		self.summary.totalDirectories += 1
+
 		for item in os.listdir(directory):
 			path = os.path.join(directory, item)
 
@@ -416,6 +454,7 @@ class CommentsSearch:
 			with open(file, 'r') as f:
 				lines = f.readlines()
 
+			self.summary.totalFiles += 1
 			self.summary.perFile[file] = 0
 
 			pos = 0
