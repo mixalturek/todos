@@ -45,6 +45,146 @@ NUM_LINES = 1
 ###############################################################################
 ####
 
+class Todos:
+	def __init__(self):
+		pass
+
+
+	def main(self, argv):
+		parameters = self.parseCommandLineArguments(argv)
+		self.logger = Logger(parameters.verbose)
+		self.dumpConfiguration(parameters)
+
+		commentsSearch = CommentsSearch(parameters, self.logger)
+		commentsSearch.search()
+
+		outputWriter = OutputWriter(parameters, self.logger)
+		outputWriter.output(commentsSearch)
+
+
+	def parseCommandLineArguments(self, argv):
+		parser = argparse.ArgumentParser(
+				prog='todos',
+				description='Search project directory for TODO, FIXME and similar comments.',
+				formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+		parser.add_argument(
+				'-V', '--version',
+				help='show version and exit',
+				action='version',
+				version='%(prog)s ' + TODOS_VERSION)
+
+		parser.add_argument(
+				'-v', '--verbose',
+				help='increase output verbosity',
+				action='store_true',
+				default=False)
+
+		parser.add_argument(
+				'-c', '--comment',
+				nargs='+',
+				help='the comment characters',
+				metavar='COMMENT',
+				dest='comments',
+				default=COMMENTS)
+
+		parser.add_argument(
+				'-e', '--regexp',
+				nargs='+',
+				help="the pattern to search; see Python's re module for proper syntax",
+				metavar='PATTERN',
+				dest='patterns',
+				default=PATTERNS)
+
+		parser.add_argument(
+				'-A', '--after-context',
+				type=int,
+				metavar='NUM',
+				dest='numLines',
+				help='number of lines that are sent to the output together with the matching line',
+				default=NUM_LINES)
+
+		parser.add_argument(
+				'-t', '--file-ext',
+				metavar='EXT',
+				nargs='+',
+				help='check only files with the specified extension',
+				dest='extensions')
+
+		parser.add_argument(
+				'-D', '--suppressed',
+				metavar='DIR',
+				nargs='+',
+				help='suppress the specified directory',
+				default=SUPPRESSED)
+
+		parser.add_argument(
+				'-i', '--ignore-case',
+				action='store_true',
+				help='ignore case distinctions',
+				dest='ignoreCase',
+				default=False)
+
+		parser.add_argument(
+				'-o', '--out-txt',
+				metavar='TXT',
+				dest='outTxt',
+				help='the output text file; standard output will be used if the path is not specified')
+
+		parser.add_argument(
+				'-x', '--out-xml',
+				metavar='XML',
+				dest='outXml',
+				help='the output XML file')
+
+		parser.add_argument(
+				'-m', '--out-html',
+				metavar='HTML',
+				dest='outHtml',
+				help='the output HTML file')
+
+		parser.add_argument(
+				'-f', '--force',
+				action='store_true',
+				default=False,
+				help='override existing output files')
+
+		parser.add_argument(
+				'directory',
+				nargs='*',
+				help='the input directory to search in',
+				# ValueError: dest supplied twice for positional argument
+				# dest='directories',
+				default=DIRECTORIES)
+
+		parameters = parser.parse_args(argv)
+
+		# Workaround for ValueError: dest supplied twice for positional argument
+		parameters.directories = parameters.directory
+
+		return parameters
+
+
+	def dumpConfiguration(self, parameters):
+		self.logger.verbose('Command line arguments:')
+		self.logger.verbose('verbose: {0}'.format(parameters.verbose))
+		self.logger.verbose('comments: {0}'.format(parameters.comments))
+		self.logger.verbose('patterns: {0}'.format(parameters.patterns))
+		self.logger.verbose('extensions: {0}'.format(parameters.extensions))
+		self.logger.verbose('suppressed-dirs: {0}'.format(parameters.suppressed))
+		self.logger.verbose('ignore-case: {0}'.format(parameters.ignoreCase))
+		self.logger.verbose('num-lines: {0}'.format(parameters.numLines))
+		self.logger.verbose('out-txt: {0}'.format(parameters.outTxt))
+		self.logger.verbose('out-xml: {0}'.format(parameters.outXml))
+		self.logger.verbose('out-html: {0}'.format(parameters.outHtml))
+		self.logger.verbose('force: {0}'.format(parameters.force))
+		self.logger.verbose('directories: {0}'.format(parameters.directories))
+		self.logger.verbose('')
+
+
+###############################################################################
+####
+
 class Logger:
 	def __init__(self, verboseEnabled):
 		self.verboseEnabled = verboseEnabled
@@ -72,6 +212,244 @@ class Comment:
 		self.file = file
 		self.pos = pos
 		self.lines = lines
+
+
+###############################################################################
+####
+
+class Pattern:
+	def __init__(self, pattern, rePattern):
+		self.pattern = pattern
+		self.rePattern = rePattern
+
+
+	def __str__(self):
+		return self.pattern
+
+
+###############################################################################
+####
+
+class Summary:
+	def __init__(self, parameters):
+		self.totalFiles = 0
+		self.totalDirectories = 0
+
+		self.perPattern = {}
+		self.perFile = {}
+
+		for pattern in parameters.patterns:
+			self.perPattern[pattern] = 0
+
+
+###############################################################################
+####
+
+class CommentsSearch:
+	def __init__(self, parameters, logger):
+		self.parameters = parameters
+		self.logger = logger
+		self.comments = []
+		self.summary = Summary(parameters)
+
+		if self.parameters.extensions is not None:
+			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
+
+		flags = 0
+		if self.parameters.ignoreCase:
+			flags = re.IGNORECASE
+
+		self.parameters.compiledPatterns = []
+		for pattern in self.parameters.patterns:
+			try:
+				self.parameters.compiledPatterns.append(Pattern(pattern, re.compile(pattern, flags)))
+			except re.error as e:
+				print >> sys.stderr, 'Pattern compilation failed:', pattern + ',', e
+
+
+	def search(self):
+		self.processDirectories()
+
+
+	def processDirectories(self):
+		for directory in self.parameters.directories:
+			self.processDirectory(directory, directory)
+
+
+	def isDirectorySuppressed(self, directory, dirName):
+		if self.parameters.suppressed is None:
+			return False
+
+		return dirName in self.parameters.suppressed
+
+
+	def processDirectory(self, directory, dirName):
+		'''
+		Recursively search files in specified directories.
+
+		:param directory: the directory to search the files in
+		'''
+
+		if not os.path.isdir(directory):
+			self.logger.verbose('Skipping directory (not a directory): ' + directory)
+			return
+
+		if self.isDirectorySuppressed(directory, dirName):
+			self.logger.verbose('Skipping directory (suppressed): ' + directory)
+			return
+
+		self.summary.totalDirectories += 1
+
+		for item in os.listdir(directory):
+			path = os.path.join(directory, item)
+
+			if os.path.isfile(path):
+				self.processFile(path)
+			else:
+				self.processDirectory(path, item)
+
+
+	def isFileExtensionAllowed(self, file):
+		if self.parameters.extensions is None:
+			return True
+
+		for extension in self.parameters.extensions:
+			if file.endswith(extension):
+				return True
+
+		return False
+
+
+	def isFileBinary(self, file):
+		CHUNK_SIZE = 1024
+
+		try:
+			with open(file, 'rb') as f:
+				chunk = f.read(CHUNK_SIZE)
+		except IOError as e:
+			print >> sys.stderr, 'Reading from file failed:', e
+			return True
+
+		# If the begin of the file contains a null byte, guess that the file is binary.
+		# GNU grep works similarly, see file_is_binary() in its source codes.
+		#
+		# The following works nicely for common ascii/utf8 encoded source codes
+		# with binary object files, images and jar packages in the same directory tree.
+		# The heuristic can be extended in future if needed,
+		#
+		# Note UTF-16 encoded text files will be clasified as binary, is it correct/incorrect?
+		return '\0' in chunk
+
+
+	def processFile(self, file):
+		if not self.isFileExtensionAllowed(file):
+			self.logger.verbose('Skipping file (file extension): ' + file)
+			return
+
+		if self.isFileBinary(file):
+			self.logger.verbose('Skipping file (binary file): ' + file)
+			return
+
+		self.logger.verbose('Parsing file: ' + file)
+
+		try:
+			with open(file, 'r') as f:
+				lines = f.readlines()
+
+			self.summary.totalFiles += 1
+			self.summary.perFile[file] = 0
+
+			pos = 0
+			for line in lines:
+				pos += 1
+				self.processLine(file, pos, line, lines)
+		except IOError as e:
+			print >> sys.stderr, 'Reading from file failed:', e
+		except UnicodeError as e:
+			self.logger.verbose('Skipping file (unicode error): ' + file)
+
+
+	def containsComment(self, line):
+		for comment in self.parameters.comments:
+			if line.count(comment) > 0:
+				return True
+
+		return False
+
+
+	def processLine(self, file, pos, line, lines):
+		if not self.containsComment(line):
+			return
+
+		for pattern in self.parameters.compiledPatterns:
+			if pattern.rePattern.search(line):
+				self.comments.append(Comment(pattern.pattern, file, pos,
+						self.getLines(lines, pos-1, self.parameters.numLines)))
+				self.summary.perPattern[pattern.pattern] += 1
+				self.summary.perFile[file] += 1
+				break
+
+
+	def getLines(self, lines, pos, num):
+		lastLine = pos+num
+		if lastLine >= len(lines):
+			lastLine = len(lines)
+
+		result = []
+		for i in range(pos, lastLine):
+			result.append(lines[i].rstrip())
+
+		return result
+
+
+###############################################################################
+####
+
+class OutputWriter:
+	def __init__(self, parameters, logger):
+		self.parameters = parameters
+		self.logger = logger
+
+
+	def output(self, commentsSearch):
+		outputWritten = False
+
+		if self.parameters.outTxt is not None:
+			self.outputDataToFile(self.parameters.outTxt, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
+			outputWritten = True
+
+		if self.parameters.outXml is not None:
+			self.outputDataToFile(self.parameters.outXml, XmlFormatter(), commentsSearch)
+			outputWritten = True
+
+		if self.parameters.outHtml is not None:
+			self.outputDataToFile(self.parameters.outHtml, HtmlFormatter(), commentsSearch)
+			outputWritten = True
+
+		# Use stdout if no output method is specified explicitly
+		if outputWritten == False:
+			self.outputData(sys.stdout, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
+
+
+	def outputData(self, outStream, formatter, commentsSearch):
+		formatter.writeHeader(outStream)
+		formatter.writeData(outStream, commentsSearch.comments, commentsSearch.summary)
+		formatter.writeFooter(outStream)
+
+
+	def outputDataToFile(self, path, formatter, commentsSearch):
+		self.logger.verbose('Writing {0} output: {1}'.format(formatter.getType(), path))
+
+		if os.path.exists(path) and not self.parameters.force:
+			print >> sys.stderr, 'File exists, use force parameter to override:', path
+			return
+
+		try:
+			with open(path, 'w') as outStream:
+				self.outputData(outStream, formatter, commentsSearch)
+		except IOError as e:
+			print >> sys.stderr, 'Output failed:', e
+			return
 
 
 ###############################################################################
@@ -333,384 +711,6 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 		print >> outStream, '</tbody>\n</table>\n'
-
-
-###############################################################################
-####
-
-class Pattern:
-	def __init__(self, pattern, rePattern):
-		self.pattern = pattern
-		self.rePattern = rePattern
-
-
-	def __str__(self):
-		return self.pattern
-
-
-###############################################################################
-####
-
-class Summary:
-	def __init__(self, parameters):
-		self.totalFiles = 0
-		self.totalDirectories = 0
-
-		self.perPattern = {}
-		self.perFile = {}
-
-		for pattern in parameters.patterns:
-			self.perPattern[pattern] = 0
-
-
-###############################################################################
-####
-
-class CommentsSearch:
-	def __init__(self, parameters, logger):
-		self.parameters = parameters
-		self.logger = logger
-		self.comments = []
-		self.summary = Summary(parameters)
-
-		if self.parameters.extensions is not None:
-			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
-
-		flags = 0
-		if self.parameters.ignoreCase:
-			flags = re.IGNORECASE
-
-		self.parameters.compiledPatterns = []
-		for pattern in self.parameters.patterns:
-			try:
-				self.parameters.compiledPatterns.append(Pattern(pattern, re.compile(pattern, flags)))
-			except re.error as e:
-				print >> sys.stderr, 'Pattern compilation failed:', pattern + ',', e
-
-
-	def search(self):
-		self.processDirectories()
-
-
-	def processDirectories(self):
-		for directory in self.parameters.directories:
-			self.processDirectory(directory, directory)
-
-
-	def isDirectorySuppressed(self, directory, dirName):
-		if self.parameters.suppressed is None:
-			return False
-
-		return dirName in self.parameters.suppressed
-
-
-	def processDirectory(self, directory, dirName):
-		'''
-		Recursively search files in specified directories.
-
-		:param directory: the directory to search the files in
-		'''
-
-		if not os.path.isdir(directory):
-			self.logger.verbose('Skipping directory (not a directory): ' + directory)
-			return
-
-		if self.isDirectorySuppressed(directory, dirName):
-			self.logger.verbose('Skipping directory (suppressed): ' + directory)
-			return
-
-		self.summary.totalDirectories += 1
-
-		for item in os.listdir(directory):
-			path = os.path.join(directory, item)
-
-			if os.path.isfile(path):
-				self.processFile(path)
-			else:
-				self.processDirectory(path, item)
-
-
-	def isFileExtensionAllowed(self, file):
-		if self.parameters.extensions is None:
-			return True
-
-		for extension in self.parameters.extensions:
-			if file.endswith(extension):
-				return True
-
-		return False
-
-
-	def isFileBinary(self, file):
-		CHUNK_SIZE = 1024
-
-		try:
-			with open(file, 'rb') as f:
-				chunk = f.read(CHUNK_SIZE)
-		except IOError as e:
-			print >> sys.stderr, 'Reading from file failed:', e
-			return True
-
-		# If the begin of the file contains a null byte, guess that the file is binary.
-		# GNU grep works similarly, see file_is_binary() in its source codes.
-		#
-		# The following works nicely for common ascii/utf8 encoded source codes
-		# with binary object files, images and jar packages in the same directory tree.
-		# The heuristic can be extended in future if needed,
-		#
-		# Note UTF-16 encoded text files will be clasified as binary, is it correct/incorrect?
-		return '\0' in chunk
-
-
-	def processFile(self, file):
-		if not self.isFileExtensionAllowed(file):
-			self.logger.verbose('Skipping file (file extension): ' + file)
-			return
-
-		if self.isFileBinary(file):
-			self.logger.verbose('Skipping file (binary file): ' + file)
-			return
-
-		self.logger.verbose('Parsing file: ' + file)
-
-		try:
-			with open(file, 'r') as f:
-				lines = f.readlines()
-
-			self.summary.totalFiles += 1
-			self.summary.perFile[file] = 0
-
-			pos = 0
-			for line in lines:
-				pos += 1
-				self.processLine(file, pos, line, lines)
-		except IOError as e:
-			print >> sys.stderr, 'Reading from file failed:', e
-		except UnicodeError as e:
-			self.logger.verbose('Skipping file (unicode error): ' + file)
-
-
-	def containsComment(self, line):
-		for comment in self.parameters.comments:
-			if line.count(comment) > 0:
-				return True
-
-		return False
-
-
-	def processLine(self, file, pos, line, lines):
-		if not self.containsComment(line):
-			return
-
-		for pattern in self.parameters.compiledPatterns:
-			if pattern.rePattern.search(line):
-				self.comments.append(Comment(pattern.pattern, file, pos,
-						self.getLines(lines, pos-1, self.parameters.numLines)))
-				self.summary.perPattern[pattern.pattern] += 1
-				self.summary.perFile[file] += 1
-				break
-
-
-	def getLines(self, lines, pos, num):
-		lastLine = pos+num
-		if lastLine >= len(lines):
-			lastLine = len(lines)
-
-		result = []
-		for i in range(pos, lastLine):
-			result.append(lines[i].rstrip())
-
-		return result
-
-
-###############################################################################
-####
-
-class OutputWriter:
-	def __init__(self, parameters, logger):
-		self.parameters = parameters
-		self.logger = logger
-
-
-	def output(self, commentsSearch):
-		outputWritten = False
-
-		if self.parameters.outTxt is not None:
-			self.outputDataToFile(self.parameters.outTxt, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
-			outputWritten = True
-
-		if self.parameters.outXml is not None:
-			self.outputDataToFile(self.parameters.outXml, XmlFormatter(), commentsSearch)
-			outputWritten = True
-
-		if self.parameters.outHtml is not None:
-			self.outputDataToFile(self.parameters.outHtml, HtmlFormatter(), commentsSearch)
-			outputWritten = True
-
-		# Use stdout if no output method is specified explicitly
-		if outputWritten == False:
-			self.outputData(sys.stdout, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
-
-
-	def outputData(self, outStream, formatter, commentsSearch):
-		formatter.writeHeader(outStream)
-		formatter.writeData(outStream, commentsSearch.comments, commentsSearch.summary)
-		formatter.writeFooter(outStream)
-
-
-	def outputDataToFile(self, path, formatter, commentsSearch):
-		self.logger.verbose('Writing {0} output: {1}'.format(formatter.getType(), path))
-
-		if os.path.exists(path) and not self.parameters.force:
-			print >> sys.stderr, 'File exists, use force parameter to override:', path
-			return
-
-		try:
-			with open(path, 'w') as outStream:
-				self.outputData(outStream, formatter, commentsSearch)
-		except IOError as e:
-			print >> sys.stderr, 'Output failed:', e
-			return
-
-
-###############################################################################
-####
-
-class Todos:
-	def __init__(self):
-		pass
-
-
-	def parseCommandLineArguments(self, argv):
-		parser = argparse.ArgumentParser(
-				prog='todos',
-				description='Search project directory for TODO, FIXME and similar comments.',
-				formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-		parser.add_argument(
-				'-V', '--version',
-				help='show version and exit',
-				action='version',
-				version='%(prog)s ' + TODOS_VERSION)
-
-		parser.add_argument(
-				'-v', '--verbose',
-				help='increase output verbosity',
-				action='store_true',
-				default=False)
-
-		parser.add_argument(
-				'-c', '--comment',
-				nargs='+',
-				help='the comment characters',
-				metavar='COMMENT',
-				dest='comments',
-				default=COMMENTS)
-
-		parser.add_argument(
-				'-e', '--regexp',
-				nargs='+',
-				help="the pattern to search; see Python's re module for proper syntax",
-				metavar='PATTERN',
-				dest='patterns',
-				default=PATTERNS)
-
-		parser.add_argument(
-				'-A', '--after-context',
-				type=int,
-				metavar='NUM',
-				dest='numLines',
-				help='number of lines that are sent to the output together with the matching line',
-				default=NUM_LINES)
-
-		parser.add_argument(
-				'-t', '--file-ext',
-				metavar='EXT',
-				nargs='+',
-				help='check only files with the specified extension',
-				dest='extensions')
-
-		parser.add_argument(
-				'-D', '--suppressed',
-				metavar='DIR',
-				nargs='+',
-				help='suppress the specified directory',
-				default=SUPPRESSED)
-
-		parser.add_argument(
-				'-i', '--ignore-case',
-				action='store_true',
-				help='ignore case distinctions',
-				dest='ignoreCase',
-				default=False)
-
-		parser.add_argument(
-				'-o', '--out-txt',
-				metavar='TXT',
-				dest='outTxt',
-				help='the output text file; standard output will be used if the path is not specified')
-
-		parser.add_argument(
-				'-x', '--out-xml',
-				metavar='XML',
-				dest='outXml',
-				help='the output XML file')
-
-		parser.add_argument(
-				'-m', '--out-html',
-				metavar='HTML',
-				dest='outHtml',
-				help='the output HTML file')
-
-		parser.add_argument(
-				'-f', '--force',
-				action='store_true',
-				default=False,
-				help='override existing output files')
-
-		parser.add_argument(
-				'directory',
-				nargs='*',
-				help='the input directory to search in',
-				# ValueError: dest supplied twice for positional argument
-				# dest='directories',
-				default=DIRECTORIES)
-
-		parameters = parser.parse_args(argv)
-
-		# Workaround for ValueError: dest supplied twice for positional argument
-		parameters.directories = parameters.directory
-
-		return parameters
-
-
-	def dumpConfiguration(self, parameters):
-		self.logger.verbose('Command line arguments:')
-		self.logger.verbose('verbose: {0}'.format(parameters.verbose))
-		self.logger.verbose('comments: {0}'.format(parameters.comments))
-		self.logger.verbose('patterns: {0}'.format(parameters.patterns))
-		self.logger.verbose('extensions: {0}'.format(parameters.extensions))
-		self.logger.verbose('suppressed-dirs: {0}'.format(parameters.suppressed))
-		self.logger.verbose('ignore-case: {0}'.format(parameters.ignoreCase))
-		self.logger.verbose('num-lines: {0}'.format(parameters.numLines))
-		self.logger.verbose('out-txt: {0}'.format(parameters.outTxt))
-		self.logger.verbose('out-xml: {0}'.format(parameters.outXml))
-		self.logger.verbose('out-html: {0}'.format(parameters.outHtml))
-		self.logger.verbose('force: {0}'.format(parameters.force))
-		self.logger.verbose('directories: {0}'.format(parameters.directories))
-		self.logger.verbose('')
-
-
-	def main(self, argv):
-		parameters = self.parseCommandLineArguments(argv)
-		self.logger = Logger(parameters.verbose)
-		self.dumpConfiguration(parameters)
-
-		commentsSearch = CommentsSearch(parameters, self.logger)
-		commentsSearch.search()
-
-		outputWriter = OutputWriter(parameters, self.logger)
-		outputWriter.output(commentsSearch)
 
 
 ###############################################################################
