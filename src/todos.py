@@ -56,8 +56,6 @@ class Comment:
 ###############################################################################
 ####
 
-# TODO: summary in TXT
-
 class TxtFormatter:
 	MULTILINE_DELIMITER = '--'
 
@@ -368,23 +366,6 @@ class CommentsSearch:
 				print >> sys.stderr, 'Pattern compilation failed:', pattern + ',', e
 
 
-	def dumpConfiguration(self):
-		self.verbose('Command line arguments:')
-		self.verbose('verbose: ' + str(self.parameters.verbose))
-		self.verbose('comments: ' + str(self.parameters.comments))
-		self.verbose('patterns: ' + str(self.parameters.patterns))
-		self.verbose('extensions: ' + str(self.parameters.extensions))
-		self.verbose('suppressed-dirs: ' + str(self.parameters.suppressed))
-		self.verbose('ignore-case: ' + str(self.parameters.ignoreCase))
-		self.verbose('num-lines: ' + str(self.parameters.numLines))
-		self.verbose('out-txt: ' + str(self.parameters.outTxt))
-		self.verbose('out-xml: ' + str(self.parameters.outXml))
-		self.verbose('out-html: ' + str(self.parameters.outHtml))
-		self.verbose('force: ' + str(self.parameters.force))
-		self.verbose('directories: ' + str(self.parameters.directories))
-		self.verbose('')
-
-
 	def search(self):
 		self.processDirectories()
 
@@ -569,117 +550,141 @@ class CommentsSearch:
 ###############################################################################
 ####
 
-def parseCommandLineArguments():
-	parser = argparse.ArgumentParser(
-			prog='todos',
-			description='Search project directory for TODO, FIXME and similar comments.',
-			formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-	parser.add_argument(
-			'-V', '--version',
-			help='show version and exit',
-			action='version',
-			version='%(prog)s ' + TODOS_VERSION)
-
-	parser.add_argument(
-			'-v', '--verbose',
-			help='increase output verbosity',
-			action='store_true',
-			default=False)
-
-	parser.add_argument(
-			'-c', '--comment',
-			nargs='+',
-			help='the comment characters',
-			metavar='COMMENT',
-			dest='comments',
-			default=COMMENTS)
-
-	parser.add_argument(
-			'-e', '--regexp',
-			nargs='+',
-			help="the pattern to search; see Python's re module for proper syntax",
-			metavar='PATTERN',
-			dest='patterns',
-			default=PATTERNS)
-
-	parser.add_argument(
-			'-A', '--after-context',
-			type=int,
-			metavar='NUM',
-			dest='numLines',
-			help='number of lines that are sent to the output together with the matching line',
-			default=NUM_LINES)
-
-	parser.add_argument(
-			'-t', '--file-ext',
-			metavar='EXT',
-			nargs='+',
-			help='check only files with the specified extension',
-			dest='extensions')
-
-	parser.add_argument(
-			'-D', '--suppressed',
-			metavar='DIR',
-			nargs='+',
-			help='suppress the specified directory',
-			default=SUPPRESSED)
-
-	parser.add_argument(
-			'-i', '--ignore-case',
-			action='store_true',
-			help='ignore case distinctions',
-			dest='ignoreCase',
-			default=False)
-
-	parser.add_argument(
-			'-o', '--out-txt',
-			metavar='TXT',
-			dest='outTxt',
-			help='the output text file; standard output will be used if the path is not specified')
-
-	parser.add_argument(
-			'-x', '--out-xml',
-			metavar='XML',
-			dest='outXml',
-			help='the output XML file')
-
-	parser.add_argument(
-			'-m', '--out-html',
-			metavar='HTML',
-			dest='outHtml',
-			help='the output HTML file')
-
-	parser.add_argument(
-			'-f', '--force',
-			action='store_true',
-			default=False,
-			help='override existing output files')
-
-	parser.add_argument(
-			'directory',
-			nargs='*',
-			help='the input directory to search in',
-			# ValueError: dest supplied twice for positional argument
-			# dest='directories',
-			default=DIRECTORIES)
-
-	parameters = parser.parse_args()
-
-	# Workaround for ValueError: dest supplied twice for positional argument
-	parameters.directories = parameters.directory
-
-	return parameters
+class Todos:
+	def __init__(self):
+		pass
 
 
-###############################################################################
-####
+	def parseCommandLineArguments(self, argv):
+		parser = argparse.ArgumentParser(
+				prog='todos',
+				description='Search project directory for TODO, FIXME and similar comments.',
+				formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-def main():
-	commentsSearch = CommentsSearch(parseCommandLineArguments())
-	commentsSearch.dumpConfiguration()
-	commentsSearch.search()
-	commentsSearch.output()
+		parser.add_argument(
+				'-V', '--version',
+				help='show version and exit',
+				action='version',
+				version='%(prog)s ' + TODOS_VERSION)
+
+		parser.add_argument(
+				'-v', '--verbose',
+				help='increase output verbosity',
+				action='store_true',
+				default=False)
+
+		parser.add_argument(
+				'-c', '--comment',
+				nargs='+',
+				help='the comment characters',
+				metavar='COMMENT',
+				dest='comments',
+				default=COMMENTS)
+
+		parser.add_argument(
+				'-e', '--regexp',
+				nargs='+',
+				help="the pattern to search; see Python's re module for proper syntax",
+				metavar='PATTERN',
+				dest='patterns',
+				default=PATTERNS)
+
+		parser.add_argument(
+				'-A', '--after-context',
+				type=int,
+				metavar='NUM',
+				dest='numLines',
+				help='number of lines that are sent to the output together with the matching line',
+				default=NUM_LINES)
+
+		parser.add_argument(
+				'-t', '--file-ext',
+				metavar='EXT',
+				nargs='+',
+				help='check only files with the specified extension',
+				dest='extensions')
+
+		parser.add_argument(
+				'-D', '--suppressed',
+				metavar='DIR',
+				nargs='+',
+				help='suppress the specified directory',
+				default=SUPPRESSED)
+
+		parser.add_argument(
+				'-i', '--ignore-case',
+				action='store_true',
+				help='ignore case distinctions',
+				dest='ignoreCase',
+				default=False)
+
+		parser.add_argument(
+				'-o', '--out-txt',
+				metavar='TXT',
+				dest='outTxt',
+				help='the output text file; standard output will be used if the path is not specified')
+
+		parser.add_argument(
+				'-x', '--out-xml',
+				metavar='XML',
+				dest='outXml',
+				help='the output XML file')
+
+		parser.add_argument(
+				'-m', '--out-html',
+				metavar='HTML',
+				dest='outHtml',
+				help='the output HTML file')
+
+		parser.add_argument(
+				'-f', '--force',
+				action='store_true',
+				default=False,
+				help='override existing output files')
+
+		parser.add_argument(
+				'directory',
+				nargs='*',
+				help='the input directory to search in',
+				# ValueError: dest supplied twice for positional argument
+				# dest='directories',
+				default=DIRECTORIES)
+
+		parameters = parser.parse_args(argv)
+
+		# Workaround for ValueError: dest supplied twice for positional argument
+		parameters.directories = parameters.directory
+
+		return parameters
+
+
+	def dumpConfigurationIfVerbose(self, parameters):
+		if not parameters.verbose:
+			return
+
+		print 'Command line arguments:'
+		print 'verbose: ', parameters.verbose
+		print 'comments: ', parameters.comments
+		print 'patterns: ', parameters.patterns
+		print 'extensions: ', parameters.extensions
+		print 'suppressed-dirs: ', parameters.suppressed
+		print 'ignore-case: ', parameters.ignoreCase
+		print 'num-lines: ', parameters.numLines
+		print 'out-txt: ', parameters.outTxt
+		print 'out-xml: ', parameters.outXml
+		print 'out-html: ', parameters.outHtml
+		print 'force: ', parameters.force
+		print 'directories: ', parameters.directories
+		print ''
+
+
+	def main(self, argv):
+		parameters = self.parseCommandLineArguments(argv)
+		self.dumpConfigurationIfVerbose(parameters)
+
+		commentsSearch = CommentsSearch(parameters)
+		commentsSearch.search()
+		commentsSearch.output()
 
 
 ###############################################################################
@@ -687,6 +692,7 @@ def main():
 
 if __name__ == '__main__':
 	try:
-		main()
+		todos = Todos()
+		todos.main(sys.argv[1:])
 	except KeyboardInterrupt as e:
 		sys.exit('\nERROR: Interrupted by user')
