@@ -45,6 +45,27 @@ NUM_LINES = 1
 ###############################################################################
 ####
 
+class Logger:
+	def __init__(self, verboseEnabled):
+		self.verboseEnabled = verboseEnabled
+
+
+	def verbose(self, message):
+		if self.verboseEnabled:
+			print message
+
+
+	def warn(self, message):
+		print sys.stderr, message
+
+
+	def error(self, message):
+		print sys.stderr, message
+
+
+###############################################################################
+####
+
 class Comment:
 	def __init__(self, pattern, file, pos, lines):
 		self.pattern = pattern
@@ -346,8 +367,9 @@ class Summary:
 ####
 
 class CommentsSearch:
-	def __init__(self, parameters):
+	def __init__(self, parameters, logger):
 		self.parameters = parameters
+		self.logger = logger
 		self.comments = []
 		self.summary = Summary(parameters)
 
@@ -370,11 +392,6 @@ class CommentsSearch:
 		self.processDirectories()
 
 
-	def verbose(self, message):
-		if self.parameters.verbose:
-			print message
-
-
 	def processDirectories(self):
 		for directory in self.parameters.directories:
 			self.processDirectory(directory, directory)
@@ -395,11 +412,11 @@ class CommentsSearch:
 		'''
 
 		if not os.path.isdir(directory):
-			self.verbose('Skipping directory (not a directory): ' + directory)
+			self.logger.verbose('Skipping directory (not a directory): ' + directory)
 			return
 
 		if self.isDirectorySuppressed(directory, dirName):
-			self.verbose('Skipping directory (suppressed): ' + directory)
+			self.logger.verbose('Skipping directory (suppressed): ' + directory)
 			return
 
 		self.summary.totalDirectories += 1
@@ -447,14 +464,14 @@ class CommentsSearch:
 
 	def processFile(self, file):
 		if not self.isFileExtensionAllowed(file):
-			self.verbose('Skipping file (file extension): ' + file)
+			self.logger.verbose('Skipping file (file extension): ' + file)
 			return
 
 		if self.isFileBinary(file):
-			self.verbose('Skipping file (binary file): ' + file)
+			self.logger.verbose('Skipping file (binary file): ' + file)
 			return
 
-		self.verbose('Parsing file: ' + file)
+		self.logger.verbose('Parsing file: ' + file)
 
 		try:
 			with open(file, 'r') as f:
@@ -470,7 +487,7 @@ class CommentsSearch:
 		except IOError as e:
 			print >> sys.stderr, 'Reading from file failed:', e
 		except UnicodeError as e:
-			self.verbose('Skipping file (unicode error): ' + file)
+			self.logger.verbose('Skipping file (unicode error): ' + file)
 
 
 	def containsComment(self, line):
@@ -506,34 +523,43 @@ class CommentsSearch:
 		return result
 
 
-	def output(self):
+###############################################################################
+####
+
+class OutputWriter:
+	def __init__(self, parameters, logger):
+		self.parameters = parameters
+		self.logger = logger
+
+
+	def output(self, commentsSearch):
 		outputWritten = False
 
 		if self.parameters.outTxt is not None:
-			self.outputDataToFile(self.parameters.outTxt, TxtFormatter(self.parameters.numLines > 1))
+			self.outputDataToFile(self.parameters.outTxt, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
 			outputWritten = True
 
 		if self.parameters.outXml is not None:
-			self.outputDataToFile(self.parameters.outXml, XmlFormatter())
+			self.outputDataToFile(self.parameters.outXml, XmlFormatter(), commentsSearch)
 			outputWritten = True
 
 		if self.parameters.outHtml is not None:
-			self.outputDataToFile(self.parameters.outHtml, HtmlFormatter())
+			self.outputDataToFile(self.parameters.outHtml, HtmlFormatter(), commentsSearch)
 			outputWritten = True
 
 		# Use stdout if no output method is specified explicitly
 		if outputWritten == False:
-			self.outputData(sys.stdout, TxtFormatter(self.parameters.numLines > 1))
+			self.outputData(sys.stdout, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
 
 
-	def outputData(self, outStream, formatter):
+	def outputData(self, outStream, formatter, commentsSearch):
 		formatter.writeHeader(outStream)
-		formatter.writeData(outStream, self.comments, self.summary)
+		formatter.writeData(outStream, commentsSearch.comments, commentsSearch.summary)
 		formatter.writeFooter(outStream)
 
 
-	def outputDataToFile(self, path, formatter):
-		self.verbose('Writing {0} output: {1}'.format(formatter.getType(), path))
+	def outputDataToFile(self, path, formatter, commentsSearch):
+		self.logger.verbose('Writing {0} output: {1}'.format(formatter.getType(), path))
 
 		if os.path.exists(path) and not self.parameters.force:
 			print >> sys.stderr, 'File exists, use force parameter to override:', path
@@ -541,7 +567,7 @@ class CommentsSearch:
 
 		try:
 			with open(path, 'w') as outStream:
-				self.outputData(outStream, formatter)
+				self.outputData(outStream, formatter, commentsSearch)
 		except IOError as e:
 			print >> sys.stderr, 'Output failed:', e
 			return
@@ -658,33 +684,33 @@ class Todos:
 		return parameters
 
 
-	def dumpConfigurationIfVerbose(self, parameters):
-		if not parameters.verbose:
-			return
-
-		print 'Command line arguments:'
-		print 'verbose: ', parameters.verbose
-		print 'comments: ', parameters.comments
-		print 'patterns: ', parameters.patterns
-		print 'extensions: ', parameters.extensions
-		print 'suppressed-dirs: ', parameters.suppressed
-		print 'ignore-case: ', parameters.ignoreCase
-		print 'num-lines: ', parameters.numLines
-		print 'out-txt: ', parameters.outTxt
-		print 'out-xml: ', parameters.outXml
-		print 'out-html: ', parameters.outHtml
-		print 'force: ', parameters.force
-		print 'directories: ', parameters.directories
-		print ''
+	def dumpConfiguration(self, parameters):
+		self.logger.verbose('Command line arguments:')
+		self.logger.verbose('verbose: {0}'.format(parameters.verbose))
+		self.logger.verbose('comments: {0}'.format(parameters.comments))
+		self.logger.verbose('patterns: {0}'.format(parameters.patterns))
+		self.logger.verbose('extensions: {0}'.format(parameters.extensions))
+		self.logger.verbose('suppressed-dirs: {0}'.format(parameters.suppressed))
+		self.logger.verbose('ignore-case: {0}'.format(parameters.ignoreCase))
+		self.logger.verbose('num-lines: {0}'.format(parameters.numLines))
+		self.logger.verbose('out-txt: {0}'.format(parameters.outTxt))
+		self.logger.verbose('out-xml: {0}'.format(parameters.outXml))
+		self.logger.verbose('out-html: {0}'.format(parameters.outHtml))
+		self.logger.verbose('force: {0}'.format(parameters.force))
+		self.logger.verbose('directories: {0}'.format(parameters.directories))
+		self.logger.verbose('')
 
 
 	def main(self, argv):
 		parameters = self.parseCommandLineArguments(argv)
-		self.dumpConfigurationIfVerbose(parameters)
+		self.logger = Logger(parameters.verbose)
+		self.dumpConfiguration(parameters)
 
-		commentsSearch = CommentsSearch(parameters)
+		commentsSearch = CommentsSearch(parameters, self.logger)
 		commentsSearch.search()
-		commentsSearch.output()
+
+		outputWriter = OutputWriter(parameters, self.logger)
+		outputWriter.output(commentsSearch)
 
 
 ###############################################################################
