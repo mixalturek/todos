@@ -25,6 +25,7 @@ import os
 import os.path
 import sys
 import re
+import socket
 from time import localtime, strftime
 from operator import itemgetter
 
@@ -167,6 +168,10 @@ class Todos:
 
 	def dumpConfiguration(self, parameters):
 		self.logger.verbose('Command line arguments:')
+		self.logger.verbose(' '.join(sys.argv))
+		self.logger.verbose('')
+
+		self.logger.verbose('Parsed command line arguments:')
 		self.logger.verbose('verbose: {0}'.format(parameters.verbose))
 		self.logger.verbose('comments: {0}'.format(parameters.comments))
 		self.logger.verbose('patterns: {0}'.format(parameters.patterns))
@@ -414,6 +419,8 @@ class OutputWriter:
 	def output(self, commentsSearch):
 		outputWritten = False
 
+		self.logger.verbose('') # New line to split the output
+
 		if self.parameters.outTxt is not None:
 			self.outputDataToFile(self.parameters.outTxt, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
 			outputWritten = True
@@ -423,10 +430,10 @@ class OutputWriter:
 			outputWritten = True
 
 		if self.parameters.outHtml is not None:
-			self.outputDataToFile(self.parameters.outHtml, HtmlFormatter(), commentsSearch)
+			self.outputDataToFile(self.parameters.outHtml, HtmlFormatter(self.parameters), commentsSearch)
 			outputWritten = True
 
-		# Use stdout if no output method is specified explicitly
+		# Use stdout if no output method is explicitly specified
 		if outputWritten == False:
 			self.outputData(sys.stdout, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
 
@@ -545,9 +552,8 @@ class XmlFormatter:
 ####
 
 class HtmlFormatter:
-	def __init__(self):
-		# Empty
-		pass
+	def __init__(self, parameters):
+		self.parameters = parameters
 
 
 	def getType(self):
@@ -578,7 +584,7 @@ body
 pre         { line-height: 1.1em; margin: 0; margin: 0.2em 0 0.2em 0; }
 a:hover     { color: blue; }
 
-table       { margin-top: 1.5em; max-width: 100%; }
+table       { margin-top: 1.5em; margin-bottom: 1.5em; max-width: 100%; }
 th          { background-color: #AFB3CC; text-align: left; }
 th, td      { vertical-align: top; padding: 0.2em 0.5em 0.2em 0.5em; }
 tr          { background-color: #D0D0EE; }
@@ -599,6 +605,9 @@ tr:hover    { background-color: #C0C0FF; }
 		print >> outStream, '<h2 id="toc">Table of Contents</h2>\n'
 		self.writeToc(outStream)
 
+		print >> outStream, '<h2 id="inputParameters">Input Parameters</h2>\n'
+		self.writeInputParameters(outStream)
+
 		print >> outStream, '<h2 id="summary">Summary</h2>\n'
 
 		print >> outStream, '<h3 id="general">General</h3>\n'
@@ -618,6 +627,7 @@ tr:hover    { background-color: #C0C0FF; }
 		print >> outStream, '''
 <ul>
 <li><a href="#toc">Table of Contents</a></li>
+<li><a href="#inputParameters">Input Parameters</a></li>
 <li><a href="#summary">Summary</a>
 	<ul>
 	<li><a href="#general">General</a></li>
@@ -630,6 +640,35 @@ tr:hover    { background-color: #C0C0FF; }
 '''
 
 
+	def writeInputParameters(self, outStream):
+		rows = [['Computer', self.htmlSpecialChars(socket.gethostname())],
+				['User', self.htmlSpecialChars(os.environ['LOGNAME'])],
+				['Python', self.htmlSpecialChars('.'.join([str(v) for v in sys.version_info[0:3]]))],
+		]
+		self.htmlTable(outStream, ['Parameter', 'Value'], rows)
+
+		print >> outStream, '<pre>'
+		print >> outStream, 'cd {0}'.format(self.htmlSpecialChars(os.getcwd()))
+		print >> outStream, self.htmlSpecialChars(' '.join(sys.argv))
+		print >> outStream, '</pre>'
+
+		rows = [['Working Directory', self.htmlSpecialChars(os.getcwd())],
+				['Verbose', self.htmlSpecialChars(str(self.parameters.verbose))],
+				['Comments', self.htmlSpecialChars(str(self.parameters.comments))],
+				['Patterns', self.htmlSpecialChars(str(self.parameters.patterns))],
+				['Extensions', self.htmlSpecialChars(str(self.parameters.extensions))],
+				['Suppressed Directories', self.htmlSpecialChars(str(self.parameters.suppressed))],
+				['Ignore Case', self.htmlSpecialChars(str(self.parameters.ignoreCase))],
+				['Number of Lines', self.htmlSpecialChars(str(self.parameters.numLines))],
+				['Output TXT File', self.htmlSpecialChars(str(self.parameters.outTxt))],
+				['Output XML File', self.htmlSpecialChars(str(self.parameters.outXml))],
+				['Output HTML File', self.htmlSpecialChars(str(self.parameters.outHtml))],
+				['Force', self.htmlSpecialChars(str(self.parameters.force))],
+				['Directories', self.htmlSpecialChars(str(self.parameters.directories))],
+		]
+		self.htmlTable(outStream, ['Parameter', 'Value'], rows)
+
+
 	def writeGeneralSummary(self, outStream, summary):
 		numFilesWithMatches = 0
 		for file, count in summary.perFile.iteritems():
@@ -639,7 +678,8 @@ tr:hover    { background-color: #C0C0FF; }
 		rows = [['Searched Patterns', len(summary.perPattern)],
 				['Files with Matches', numFilesWithMatches],
 				['Total Files', summary.totalFiles],
-				['Total Directories', summary.totalDirectories]]
+				['Total Directories', summary.totalDirectories]
+		]
 		self.htmlTable(outStream, ['Parameter', 'Value'], rows)
 
 
