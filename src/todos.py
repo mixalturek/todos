@@ -584,26 +584,43 @@ body
 pre         { line-height: 1.1em; margin: 0; margin: 0.2em 0 0.2em 0; }
 a:hover     { color: blue; }
 
-table       { margin-top: 1.5em; margin-bottom: 1.5em; max-width: 100%; }
+table       { margin-top: 1em; margin-bottom: 1em; max-width: 100%; }
 th          { background-color: #AFB3CC; text-align: left; }
 th, td      { vertical-align: top; padding: 0.2em 0.5em 0.2em 0.5em; }
 tr          { background-color: #D0D0EE; }
 tr:hover    { background-color: #C0C0FF; }
 
-#footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver; color: gray; }
+#page       { margin-left: 17%; }
+#sidebar    { position: fixed; top: 0px; left: 0px; width: 15%; padding: 2em; }
+#footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver; color: gray; clear: both; }
+
+#sidebar .menu_title { font-weight: bold; font-size: 14pt; }
+#sidebar ul { margin-left: 1em; padding-left: 0px; }
+#sidebar ul ul { margin-left: 2em; padding-left: 0px; }
+</style>
+
+<style type="text/css" media="print">
+#page       { margin-left: 0px; }
+#sidebar    { display: none; }
 </style>
 
 </head>
 
 <body>
-
-<h1>Comments Report</h1>
 '''
 
 
 	def writeData(self, outStream, comments, summary):
-		print >> outStream, '<h2 id="toc">Table of Contents</h2>\n'
+		print >> outStream, '<div id="sidebar">'
+
 		self.writeToc(outStream)
+
+		print >> outStream, '</div><!-- id="sidebar" -->'
+
+
+		print >> outStream, '<div id="page">'
+
+		print >> outStream, '<h1 id="commentsReport">Comments Report</h1>'
 
 		print >> outStream, '<h2 id="inputParameters">Input Parameters</h2>\n'
 		self.writeInputParameters(outStream)
@@ -622,20 +639,27 @@ tr:hover    { background-color: #C0C0FF; }
 		print >> outStream, '<h2 id="details">Details</h2>\n'
 		self.writeComments(outStream, comments)
 
+		print >> outStream, '</div><!-- id="page" -->'
+
 
 	def writeToc(self, outStream):
 		print >> outStream, '''
+<div class="menu_title">Menu</div>
+
 <ul>
-<li><a href="#toc">Table of Contents</a></li>
-<li><a href="#inputParameters">Input Parameters</a></li>
-<li><a href="#summary">Summary</a>
+<li><a href="#commentsReport">Comments Report</a>
 	<ul>
-	<li><a href="#general">General</a></li>
-	<li><a href="#perPatterns">Per Patterns</a></li>
-	<li><a href="#perFiles">Per Files</a></li>
+	<li><a href="#inputParameters">Input Parameters</a></li>
+	<li><a href="#summary">Summary</a>
+		<ul>
+		<li><a href="#general">General</a></li>
+		<li><a href="#perPatterns">Per Patterns</a></li>
+		<li><a href="#perFiles">Per Files</a></li>
+		</ul>
+	</li>
+	<li><a href="#details">Details</a></li>
 	</ul>
 </li>
-<li><a href="#details">Details</a></li>
 </ul>
 '''
 
@@ -650,7 +674,7 @@ tr:hover    { background-color: #C0C0FF; }
 		print >> outStream, '<pre>'
 		print >> outStream, 'cd {0}'.format(self.htmlSpecialChars(os.getcwd()))
 		print >> outStream, self.htmlSpecialChars(' '.join(sys.argv))
-		print >> outStream, '</pre>'
+		print >> outStream, '</pre>\n'
 
 		rows = [['Working Directory', self.htmlSpecialChars(os.getcwd())],
 				['Verbose', self.htmlSpecialChars(str(self.parameters.verbose))],
