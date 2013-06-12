@@ -26,6 +26,7 @@ import os.path
 import sys
 import re
 import socket
+import codecs
 from time import localtime, strftime
 from operator import itemgetter
 
@@ -41,6 +42,7 @@ PATTERNS = [r'\bTODO\b', r'\bFIXME\b']
 SUPPRESSED = ['.git', '.svn', 'CVS']
 DIRECTORIES = ['.']
 NUM_LINES = 1
+ENCODING = 'utf-8'
 
 
 ###############################################################################
@@ -54,7 +56,8 @@ class Todos:
 	def main(self, argv):
 		parameters = self.parseCommandLineArguments(argv)
 		self.logger = Logger(parameters.verbose)
-		self.dumpConfiguration(parameters)
+		self.verifyParameters(parameters)
+		self.dumpParameters(parameters)
 
 		commentsSearch = CommentsSearch(parameters, self.logger)
 		commentsSearch.search()
@@ -120,6 +123,11 @@ class Todos:
 				default=SUPPRESSED)
 
 		parser.add_argument(
+				'-n', '--encoding',
+				help='the files encoding',
+				default=ENCODING)
+
+		parser.add_argument(
 				'-i', '--ignore-case',
 				action='store_true',
 				help='ignore case distinctions',
@@ -166,7 +174,7 @@ class Todos:
 		return parameters
 
 
-	def dumpConfiguration(self, parameters):
+	def dumpParameters(self, parameters):
 		self.logger.verbose('Command line arguments:')
 		self.logger.verbose(' '.join(sys.argv))
 		self.logger.verbose('')
@@ -177,6 +185,7 @@ class Todos:
 		self.logger.verbose('patterns: {0}'.format(parameters.patterns))
 		self.logger.verbose('extensions: {0}'.format(parameters.extensions))
 		self.logger.verbose('suppressed-dirs: {0}'.format(parameters.suppressed))
+		self.logger.verbose('encoding: {0}'.format(parameters.encoding))
 		self.logger.verbose('ignore-case: {0}'.format(parameters.ignoreCase))
 		self.logger.verbose('num-lines: {0}'.format(parameters.numLines))
 		self.logger.verbose('out-txt: {0}'.format(parameters.outTxt))
@@ -185,6 +194,15 @@ class Todos:
 		self.logger.verbose('force: {0}'.format(parameters.force))
 		self.logger.verbose('directories: {0}'.format(parameters.directories))
 		self.logger.verbose('')
+
+
+	def verifyParameters(self, parameters):
+		try:
+			codecs.lookup(parameters.encoding)
+		except LookupError as e:
+			self.logger.warn('Encoding error: {0}'.format(e))
+			self.logger.warn('Changing encoding to default: {0}'.format(ENCODING))
+			parameters.encoding = ENCODING
 
 
 ###############################################################################
@@ -201,11 +219,11 @@ class Logger:
 
 
 	def warn(self, message):
-		print sys.stderr, message
+		print >> sys.stderr, 'WARN:', message
 
 
 	def error(self, message):
-		print sys.stderr, message
+		print >> sys.stderr, 'ERROR:', message
 
 
 ###############################################################################
@@ -269,7 +287,7 @@ class CommentsSearch:
 			try:
 				self.parameters.compiledPatterns.append(Pattern(pattern, re.compile(pattern, flags)))
 			except re.error as e:
-				print >> sys.stderr, 'Pattern compilation failed:', pattern + ',', e
+				self.logger.warn('Pattern compilation failed: {0}, {1}'.format(pattern, e))
 
 
 	def search(self):
@@ -296,11 +314,11 @@ class CommentsSearch:
 		'''
 
 		if not os.path.isdir(directory):
-			self.logger.verbose('Skipping directory (not a directory): ' + directory)
+			self.logger.verbose('Skipping directory (not a directory): {0}'.format(directory))
 			return
 
 		if self.isDirectorySuppressed(directory, dirName):
-			self.logger.verbose('Skipping directory (suppressed): ' + directory)
+			self.logger.verbose('Skipping directory (suppressed): {0}'.format(directory))
 			return
 
 		self.summary.totalDirectories += 1
@@ -332,7 +350,7 @@ class CommentsSearch:
 			with open(file, 'rb') as f:
 				chunk = f.read(CHUNK_SIZE)
 		except IOError as e:
-			print >> sys.stderr, 'Reading from file failed:', e
+			self.logger.warn('Reading from file failed: {0}, {1}'.format(file, e))
 			return True
 
 		# If the begin of the file contains a null byte, guess that the file is binary.
@@ -348,17 +366,17 @@ class CommentsSearch:
 
 	def processFile(self, file):
 		if not self.isFileExtensionAllowed(file):
-			self.logger.verbose('Skipping file (file extension): ' + file)
+			self.logger.verbose('Skipping file (file extension): {0}'.format(file))
 			return
 
 		if self.isFileBinary(file):
-			self.logger.verbose('Skipping file (binary file): ' + file)
+			self.logger.verbose('Skipping file (binary file): {0}'.format(file))
 			return
 
-		self.logger.verbose('Parsing file: ' + file)
+		self.logger.verbose('Parsing file: {0}'.format(file))
 
 		try:
-			with open(file, 'r') as f:
+			with codecs.open(file, 'r', self.parameters.encoding) as f:
 				lines = f.readlines()
 
 			self.summary.totalFiles += 1
@@ -369,9 +387,9 @@ class CommentsSearch:
 				pos += 1
 				self.processLine(file, pos, line, lines)
 		except IOError as e:
-			print >> sys.stderr, 'Reading from file failed:', e
+			self.logger.warn('Reading from file failed: {0}, {1}'.format(file, e))
 		except UnicodeError as e:
-			self.logger.verbose('Skipping file (unicode error): ' + file)
+			self.logger.warn('Skipping file (unicode error): {0}'.format(file))
 
 
 	def containsComment(self, line):
@@ -426,7 +444,7 @@ class OutputWriter:
 			outputWritten = True
 
 		if self.parameters.outXml is not None:
-			self.outputDataToFile(self.parameters.outXml, XmlFormatter(), commentsSearch)
+			self.outputDataToFile(self.parameters.outXml, XmlFormatter(self.parameters), commentsSearch)
 			outputWritten = True
 
 		if self.parameters.outHtml is not None:
@@ -448,14 +466,14 @@ class OutputWriter:
 		self.logger.verbose('Writing {0} output: {1}'.format(formatter.getType(), path))
 
 		if os.path.exists(path) and not self.parameters.force:
-			print >> sys.stderr, 'File exists, use force parameter to override:', path
+			self.logger.warn('File exists, use force parameter to override: {0}'.format(file))
 			return
 
 		try:
-			with open(path, 'w') as outStream:
+			with codecs.open(path, 'w', self.parameters.encoding) as outStream:
 				self.outputData(outStream, formatter, commentsSearch)
 		except IOError as e:
-			print >> sys.stderr, 'Output failed:', e
+			self.logger.error('Output failed: {0}, {1}'.format(file, e))
 			return
 
 
@@ -505,9 +523,8 @@ class TxtFormatter:
 # TODO: summary in XML
 
 class XmlFormatter:
-	def __init__(self):
-		# Empty
-		pass
+	def __init__(self, parameters):
+		self.parameters = parameters
 
 
 	def getType(self):
@@ -515,7 +532,7 @@ class XmlFormatter:
 
 
 	def writeHeader(self, outStream):
-		print >> outStream, '<?xml version="1.0" encoding="utf-8" standalone="yes"?>'
+		print >> outStream, '<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(self.parameters.encoding)
 		print >> outStream, '<Todos>'
 		print >> outStream, '\t<Version todos="{0}" format="{1}">'.format(TODOS_VERSION, XML_VERSION)
 		print >> outStream, '\t<Comments>'
@@ -561,17 +578,18 @@ class HtmlFormatter:
 
 
 	def writeHeader(self, outStream):
-		print >> outStream, '''<?xml version="1.0" encoding="utf-8"?>
+		print >> outStream, '''<?xml version="1.0" encoding="{0}"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-type" content="text/html; charset={0}" />
 <meta http-equiv="content-language" content="en" />
-
 <title>Comments Report - todos</title>
+'''.format(self.parameters.encoding)
 
+		print >> outStream, '''
 <style type="text/css" media="all">
 body
 {
@@ -682,6 +700,7 @@ tr:hover    { background-color: #C0C0FF; }
 				['Patterns', self.htmlSpecialChars(str(self.parameters.patterns))],
 				['Extensions', self.htmlSpecialChars(str(self.parameters.extensions))],
 				['Suppressed Directories', self.htmlSpecialChars(str(self.parameters.suppressed))],
+				['Encoding', self.htmlSpecialChars(str(self.parameters.encoding))],
 				['Ignore Case', self.htmlSpecialChars(str(self.parameters.ignoreCase))],
 				['Number of Lines', self.htmlSpecialChars(str(self.parameters.numLines))],
 				['Output TXT File', self.htmlSpecialChars(str(self.parameters.outTxt))],
