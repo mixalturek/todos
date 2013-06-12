@@ -70,19 +70,22 @@ class Todos:
 		parser = argparse.ArgumentParser(
 				prog='todos',
 				description='Search project directory for TODO, FIXME and similar comments.',
-				formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+				formatter_class=argparse.ArgumentDefaultsHelpFormatter
+		)
 
 		parser.add_argument(
 				'-V', '--version',
 				help='show version and exit',
 				action='version',
-				version='%(prog)s ' + TODOS_VERSION)
+				version='%(prog)s ' + TODOS_VERSION
+		)
 
 		parser.add_argument(
 				'-v', '--verbose',
 				help='increase output verbosity',
 				action='store_true',
-				default=False)
+				default=False
+		)
 
 		parser.add_argument(
 				'-c', '--comment',
@@ -90,7 +93,8 @@ class Todos:
 				help='the comment characters',
 				metavar='COMMENT',
 				dest='comments',
-				default=COMMENTS)
+				default=COMMENTS
+		)
 
 		parser.add_argument(
 				'-e', '--regexp',
@@ -98,7 +102,8 @@ class Todos:
 				help="the pattern to search; see Python's re module for proper syntax",
 				metavar='PATTERN',
 				dest='patterns',
-				default=PATTERNS)
+				default=PATTERNS
+		)
 
 		parser.add_argument(
 				'-A', '--after-context',
@@ -106,57 +111,66 @@ class Todos:
 				metavar='NUM',
 				dest='numLines',
 				help='number of lines that are sent to the output together with the matching line',
-				default=NUM_LINES)
+				default=NUM_LINES
+		)
 
 		parser.add_argument(
 				'-t', '--file-ext',
 				metavar='EXT',
 				nargs='+',
 				help='check only files with the specified extension',
-				dest='extensions')
+				dest='extensions'
+		)
 
 		parser.add_argument(
 				'-D', '--suppressed',
 				metavar='DIR',
 				nargs='+',
 				help='suppress the specified directory',
-				default=SUPPRESSED)
+				default=SUPPRESSED
+		)
 
 		parser.add_argument(
 				'-n', '--encoding',
 				help='the files encoding',
-				default=ENCODING)
+				default=ENCODING
+		)
 
 		parser.add_argument(
 				'-i', '--ignore-case',
 				action='store_true',
 				help='ignore case distinctions',
 				dest='ignoreCase',
-				default=False)
+				default=False
+		)
 
 		parser.add_argument(
 				'-o', '--out-txt',
 				metavar='TXT',
 				dest='outTxt',
-				help='the output text file; standard output will be used if the path is not specified')
+				help='the output text file; standard output will be used if the path is not specified'
+		)
 
 		parser.add_argument(
 				'-x', '--out-xml',
 				metavar='XML',
 				dest='outXml',
-				help='the output XML file')
+				help='the output XML file'
+		)
 
 		parser.add_argument(
 				'-m', '--out-html',
 				metavar='HTML',
 				dest='outHtml',
-				help='the output HTML file')
+				help='the output HTML file'
+		)
 
 		parser.add_argument(
 				'-f', '--force',
 				action='store_true',
 				default=False,
-				help='override existing output files')
+				help='override existing output files'
+		)
 
 		parser.add_argument(
 				'directory',
@@ -164,7 +178,8 @@ class Todos:
 				help='the input directory to search in',
 				# ValueError: dest supplied twice for positional argument
 				# dest='directories',
-				default=DIRECTORIES)
+				default=DIRECTORIES
+		)
 
 		parameters = parser.parse_args(argv)
 
@@ -406,8 +421,8 @@ class CommentsSearch:
 
 		for pattern in self.parameters.compiledPatterns:
 			if pattern.rePattern.search(line):
-				self.comments.append(Comment(pattern.pattern, file, pos,
-						self.getLines(lines, pos-1, self.parameters.numLines)))
+				linesToStore = self.getLines(lines, pos-1, self.parameters.numLines)
+				self.comments.append(Comment(pattern.pattern, file, pos, linesToStore))
 				self.summary.perPattern[pattern.pattern] += 1
 				self.summary.perFile[file] += 1
 				break
@@ -543,7 +558,8 @@ class XmlFormatter:
 			print >> outStream, '\t\t<Comment pattern="{0}" file="{1}" line="{2}">'.format(
 					self.xmlSpecialChars(comment.pattern),
 					self.xmlSpecialChars(comment.file),
-					comment.pos)
+					comment.pos
+			)
 
 			for line in comment.lines:
 				print >> outStream, '\t\t\t{0}'.format(self.xmlSpecialChars(line))
@@ -737,8 +753,7 @@ tr:hover    { background-color: #C0C0FF; }
 
 		for file, count in perFile.iteritems():
 			if count != 0:
-				# FIXME: The link should be relative to the output directory
-				rows.append(['<a href="{0}">{0}</a>'.format(self.htmlSpecialChars(file)), count])
+				rows.append([self.htmlLink(os.path.abspath(file), file), count])
 
 		rows.sort(key=itemgetter(1), reverse=True)
 		self.htmlTable(outStream, ['File', 'Occurrences'], rows)
@@ -748,8 +763,7 @@ tr:hover    { background-color: #C0C0FF; }
 		rows = []
 
 		for comment in comments:
-			# FIXME: The link should be relative to the output directory
-			file = self.htmlLink(comment.file)
+			file = self.htmlLink(os.path.abspath(comment.file), comment.file)
 			pattern = self.htmlSpecialChars(comment.pattern)
 			content = '<pre>{0}</pre>'.format(self.htmlSpecialChars('\n'.join(comment.lines)))
 			rows.append([file, comment.pos, pattern, content])
@@ -758,7 +772,11 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeFooter(self, outStream):
-		print >> outStream, '<p id="footer">Page generated: {0}, <a href="http://todos.sourceforge.net/">todos</a>  {1}.</p>'.format(strftime("%Y-%m-%d %H:%M:%S", localtime()), TODOS_VERSION)
+		print >> outStream, '<p id="footer">Page generated: {0}, {1}, {2}.</p>'.format(
+				strftime("%Y-%m-%d %H:%M:%S", localtime()),
+				self.htmlLink('http://todos.sourceforge.net/', 'todos'),
+				TODOS_VERSION
+		)
 		print >> outStream, '</body>'
 		print >> outStream, '</html>'
 
@@ -772,8 +790,11 @@ tr:hover    { background-color: #C0C0FF; }
 		return ret
 
 
-	def htmlLink(self, destination):
-		return '<a href="{0}">{0}</a>'.format(self.htmlSpecialChars(destination))
+	def htmlLink(self, destination, text):
+		return '<a href="{0}">{1}</a>'.format(
+				self.htmlSpecialChars(destination),
+				self.htmlSpecialChars(text)
+		)
 
 
 	def htmlTable(self, outStream, headers, rows):
