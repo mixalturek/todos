@@ -295,7 +295,7 @@ class Comment:
 	Container to store one comment that was found.
 	"""
 
-	def __init__(self, pattern, file, pos, lines):
+	def __init__(self, pattern, file, position, lines):
 		"""
 		Class constructor, initialize all members.
 		"""
@@ -305,8 +305,7 @@ class Comment:
 		self.file = file
 		""" The input file. """
 
-		# TODO: rename to position
-		self.pos = pos
+		self.position = position
 		""" The position in the file. """
 
 		self.lines = lines
@@ -518,10 +517,10 @@ class CommentsSearch:
 			self.summary.totalFiles += 1
 			self.summary.perFile[file] = 0
 
-			pos = 0
+			position = 0
 			for line in lines:
-				pos += 1
-				self.processLine(file, pos, line, lines)
+				position += 1
+				self.processLine(file, position, line, lines)
 		except IOError as e:
 			self.logger.warn('Reading from file failed: {0}, {1}'.format(file, e))
 		except UnicodeError as e:
@@ -539,7 +538,7 @@ class CommentsSearch:
 		return False
 
 
-	def processLine(self, file, pos, line, lines):
+	def processLine(self, file, position, line, lines):
 		'''
 		Process the input line, search comment with one of the specified patterns.
 		'''
@@ -548,23 +547,23 @@ class CommentsSearch:
 
 		for pattern in self.parameters.compiledPatterns:
 			if pattern.rePattern.search(line):
-				linesToStore = self.getLines(lines, pos-1, self.parameters.numLines)
-				self.comments.append(Comment(pattern.pattern, file, pos, linesToStore))
+				linesToStore = self.getLines(lines, position-1, self.parameters.numLines)
+				self.comments.append(Comment(pattern.pattern, file, position, linesToStore))
 				self.summary.perPattern[pattern.pattern] += 1
 				self.summary.perFile[file] += 1
 				break
 
 
-	def getLines(self, lines, pos, num):
+	def getLines(self, lines, position, count):
 		'''
 		Return content of the specified number of lines.
 		'''
-		lastLine = pos+num
+		lastLine = position+count
 		if lastLine >= len(lines):
 			lastLine = len(lines)
 
 		result = []
-		for i in range(pos, lastLine):
+		for i in range(position, lastLine):
 			result.append(lines[i].rstrip())
 
 		return result
@@ -686,11 +685,11 @@ class TxtFormatter:
 			print >> outStream, self.MULTILINE_DELIMITER
 
 		for comment in comments:
-			pos = comment.pos
+			position = comment.position
 
 			for line in comment.lines:
-				print >> outStream, '{0}:{1}: {2}'.format(comment.file, pos, line)
-				pos += 1
+				print >> outStream, '{0}:{1}: {2}'.format(comment.file, position, line)
+				position += 1
 
 			if self.multiline:
 				print >> outStream, self.MULTILINE_DELIMITER
@@ -748,7 +747,7 @@ class XmlFormatter:
 			print >> outStream, '\t\t<Comment pattern="{0}" file="{1}" line="{2}">'.format(
 					self.xmlSpecialChars(comment.pattern),
 					self.xmlSpecialChars(comment.file),
-					comment.pos
+					comment.position
 			)
 
 			for line in comment.lines:
@@ -999,7 +998,7 @@ tr:hover    { background-color: #C0C0FF; }
 			file = self.htmlLink(os.path.abspath(comment.file), comment.file)
 			pattern = self.htmlSpecialChars(comment.pattern)
 			content = '<pre>{0}</pre>'.format(self.htmlSpecialChars('\n'.join(comment.lines)))
-			rows.append([file, comment.pos, pattern, content])
+			rows.append([file, comment.position, pattern, content])
 
 		self.htmlTable(outStream, ['File', 'Line', 'Pattern', 'Content'], rows)
 
