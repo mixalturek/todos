@@ -295,12 +295,12 @@ class Comment:
 	Container to store one comment that was found.
 	"""
 
-	def __init__(self, pattern, file, position, lines):
+	def __init__(self, strPattern, file, position, lines):
 		"""
 		Class constructor, initialize all members.
 		"""
-		self.pattern = pattern
-		""" The pattern that was found. """
+		self.strPattern = strPattern
+		""" The pattern that was searched and found. """
 
 		self.file = file
 		""" The input file. """
@@ -321,12 +321,11 @@ class Pattern:
 	"""
 
 
-	def __init__(self, pattern, rePattern):
+	def __init__(self, strPattern, rePattern):
 		"""
 		Class constructor, initialize all members.
 		"""
-		# TODO: rename pattern variable
-		self.pattern = pattern
+		self.strPattern = strPattern
 		""" The string representation of the pattern. """
 
 		self.rePattern = rePattern
@@ -337,7 +336,7 @@ class Pattern:
 		"""
 		Return a string representation of the pattern.
 		"""
-		return self.pattern
+		return self.strPattern
 
 
 ###############################################################################
@@ -364,8 +363,8 @@ class Summary:
 		self.perFile = {}
 		""" Summary per file. """
 
-		for pattern in parameters.patterns:
-			self.perPattern[pattern] = 0
+		for strPattern in parameters.patterns:
+			self.perPattern[strPattern] = 0
 
 
 ###############################################################################
@@ -401,11 +400,11 @@ class CommentsSearch:
 			flags = re.IGNORECASE
 
 		self.parameters.compiledPatterns = []
-		for pattern in self.parameters.patterns:
+		for strPattern in self.parameters.patterns:
 			try:
-				self.parameters.compiledPatterns.append(Pattern(pattern, re.compile(pattern, flags)))
+				self.parameters.compiledPatterns.append(Pattern(strPattern, re.compile(strPattern, flags)))
 			except re.error as e:
-				self.logger.warn('Pattern compilation failed: {0}, {1}'.format(pattern, e))
+				self.logger.warn('Pattern compilation failed: {0}, {1}'.format(strPattern, e))
 
 
 	def search(self):
@@ -548,8 +547,8 @@ class CommentsSearch:
 		for pattern in self.parameters.compiledPatterns:
 			if pattern.rePattern.search(line):
 				linesToStore = self.getLines(lines, position-1, self.parameters.numLines)
-				self.comments.append(Comment(pattern.pattern, file, position, linesToStore))
-				self.summary.perPattern[pattern.pattern] += 1
+				self.comments.append(Comment(pattern.strPattern, file, position, linesToStore))
+				self.summary.perPattern[pattern.strPattern] += 1
 				self.summary.perFile[file] += 1
 				break
 
@@ -745,7 +744,7 @@ class XmlFormatter:
 		"""
 		for comment in comments:
 			print >> outStream, '\t\t<Comment pattern="{0}" file="{1}" line="{2}">'.format(
-					self.xmlSpecialChars(comment.pattern),
+					self.xmlSpecialChars(comment.strPattern),
 					self.xmlSpecialChars(comment.file),
 					comment.position
 			)
@@ -968,7 +967,7 @@ tr:hover    { background-color: #C0C0FF; }
 		"""
 		Write table of the input patterns together with the number of their occurrences.
 		"""
-		rows = [[self.htmlSpecialChars(p), c] for p, c in perPattern.iteritems()]
+		rows = [[self.htmlSpecialChars(strPattern), comment] for strPattern, comment in perPattern.iteritems()]
 		rows.sort(key=itemgetter(1), reverse=True)
 		self.htmlTable(outStream, ['Pattern', 'Occurrences'], rows)
 
@@ -996,9 +995,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 		for comment in comments:
 			file = self.htmlLink(os.path.abspath(comment.file), comment.file)
-			pattern = self.htmlSpecialChars(comment.pattern)
+			strPattern = self.htmlSpecialChars(comment.strPattern)
 			content = '<pre>{0}</pre>'.format(self.htmlSpecialChars('\n'.join(comment.lines)))
-			rows.append([file, comment.position, pattern, content])
+			rows.append([file, comment.position, strPattern, content])
 
 		self.htmlTable(outStream, ['File', 'Line', 'Pattern', 'Content'], rows)
 
