@@ -58,11 +58,14 @@ class Todos:
 	parsing of the input files, searching comments and output of the results.
 	"""
 
+
 	def __init__(self):
 		"""
 		Class constructor.
 		"""
-		pass
+
+		self.logger = Logger(False) # Will be redefined in main()
+		""" The logger used in the application. """
 
 
 	def main(self, argv):
@@ -252,11 +255,13 @@ class Logger:
 	A simple logger class.
 	"""
 
+
 	def __init__(self, verboseEnabled):
 		"""
 		Class constructor.
 		"""
 		self.verboseEnabled = verboseEnabled
+		""" Flag to enable the verbose mode. """
 
 
 	def verbose(self, message):
@@ -295,9 +300,17 @@ class Comment:
 		Class constructor, initialize all members.
 		"""
 		self.pattern = pattern
+		""" The pattern that was found. """
+
 		self.file = file
+		""" The input file. """
+
+		# TODO: rename to position
 		self.pos = pos
+		""" The position in the file. """
+
 		self.lines = lines
+		""" The matching line and optionally several lines after it. """
 
 
 ###############################################################################
@@ -308,13 +321,17 @@ class Pattern:
 	Container to store one pattern (regular expression) for searching.
 	"""
 
+
 	def __init__(self, pattern, rePattern):
 		"""
 		Class constructor, initialize all members.
 		"""
 		# TODO: rename pattern variable
 		self.pattern = pattern
+		""" The string representation of the pattern. """
+
 		self.rePattern = rePattern
+		""" The precompiled pattern. """
 
 
 	def __str__(self):
@@ -334,13 +351,19 @@ class Summary:
 
 	def __init__(self, parameters):
 		"""
-		Class constructor, initialize all members to zero or empty lists.
+		Class constructor, initialize all members to zero or empty list.
 		"""
 		self.totalFiles = 0
+		""" The number of the examined files. """
+
 		self.totalDirectories = 0
+		""" The number of the examined directories. """
 
 		self.perPattern = {}
+		""" Summary per pattern. """
+
 		self.perFile = {}
+		""" Summary per file. """
 
 		for pattern in parameters.patterns:
 			self.perPattern[pattern] = 0
@@ -359,11 +382,19 @@ class CommentsSearch:
 		Class constructor, prepare the object for searching.
 		"""
 		self.parameters = parameters
+		""" The input parameters. """
+
 		self.logger = logger
+		""" The logger to output messages. """
+
 		self.comments = []
+		""" The comments that was found during the searching. """
+
 		self.summary = Summary(parameters)
+		""" The summary of the searching. """
 
 		if self.parameters.extensions is not None:
+			# TODO: append the dot only if it isn't already present
 			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
 
 		flags = 0
@@ -547,12 +578,16 @@ class OutputWriter:
 	Write the results of the searching to the output files in specified formats.
 	"""
 
+
 	def __init__(self, parameters, logger):
 		"""
 		Class constructor.
 		"""
 		self.parameters = parameters
+		""" The input parameters. """
+
 		self.logger = logger
+		""" The logger to output messages. """
 
 
 	def output(self, commentsSearch):
@@ -617,6 +652,7 @@ class TxtFormatter:
 	"""
 
 	MULTILINE_DELIMITER = '--'
+	""" Delimiter if multiline output is enabled. """
 
 
 	def __init__(self, multiline):
@@ -624,6 +660,7 @@ class TxtFormatter:
 		Class constructor.
 		"""
 		self.multiline = multiline
+		""" Multiple lines per pattern will be passed to the output. """
 
 
 	def getType(self):
@@ -677,11 +714,13 @@ class XmlFormatter:
 	XML formatter.
 	"""
 
+
 	def __init__(self, parameters):
 		"""
 		Class constructor.
 		"""
 		self.parameters = parameters
+		""" The input parameters. """
 
 
 	def getType(self):
@@ -746,11 +785,13 @@ class HtmlFormatter:
 	HTML formatter.
 	"""
 
+
 	def __init__(self, parameters):
 		"""
 		Class constructor.
 		"""
 		self.parameters = parameters
+		""" The input parameters. """
 
 
 	def getType(self):
