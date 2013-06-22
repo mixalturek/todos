@@ -19,6 +19,10 @@
 # along with todos.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Search TODO, FIXME and similar comments in project files.
+"""
+
 
 import argparse
 import os
@@ -49,11 +53,22 @@ ENCODING = 'utf-8'
 ####
 
 class Todos:
+	"""
+	Top level module class that contains enter to the application. It drives
+	parsing of the input files, searching comments and output of the results.
+	"""
+
 	def __init__(self):
+		"""
+		Class constructor.
+		"""
 		pass
 
 
 	def main(self, argv):
+		"""
+		Enter the application.
+		"""
 		parameters = self.parseCommandLineArguments(argv)
 		self.logger = Logger(parameters.verbose)
 		self.verifyParameters(parameters)
@@ -67,6 +82,9 @@ class Todos:
 
 
 	def parseCommandLineArguments(self, argv):
+		"""
+		Parse all command line arguments and return them in object form.
+		"""
 		parser = argparse.ArgumentParser(
 				prog='todos',
 				description='Search project directory for TODO, FIXME and similar comments.',
@@ -190,6 +208,9 @@ class Todos:
 
 
 	def dumpParameters(self, parameters):
+		"""
+		Dump values of parameters if a verbose output is enabled.
+		"""
 		self.logger.verbose('Command line arguments:')
 		self.logger.verbose(' '.join(sys.argv))
 		self.logger.verbose('')
@@ -212,6 +233,9 @@ class Todos:
 
 
 	def verifyParameters(self, parameters):
+		"""
+		Verify values of the input parameters.
+		"""
 		try:
 			codecs.lookup(parameters.encoding)
 		except LookupError as e:
@@ -224,20 +248,37 @@ class Todos:
 ####
 
 class Logger:
+	"""
+	A simple logger class.
+	"""
+
 	def __init__(self, verboseEnabled):
+		"""
+		Class constructor.
+		"""
 		self.verboseEnabled = verboseEnabled
 
 
 	def verbose(self, message):
+		"""
+		Output a verbose message to the standard output stream if verbose mode
+		is enabled.
+		"""
 		if self.verboseEnabled:
 			print message
 
 
 	def warn(self, message):
+		"""
+		Output a warning message to the standard error stream.
+		"""
 		print >> sys.stderr, 'WARN:', message
 
 
 	def error(self, message):
+		"""
+		Output an error message to the standard error stream.
+		"""
 		print >> sys.stderr, 'ERROR:', message
 
 
@@ -245,7 +286,14 @@ class Logger:
 ####
 
 class Comment:
+	"""
+	Container to store one comment that was found.
+	"""
+
 	def __init__(self, pattern, file, pos, lines):
+		"""
+		Class constructor, initialize all members.
+		"""
 		self.pattern = pattern
 		self.file = file
 		self.pos = pos
@@ -256,12 +304,23 @@ class Comment:
 ####
 
 class Pattern:
+	"""
+	Container to store one pattern (regular expression) for searching.
+	"""
+
 	def __init__(self, pattern, rePattern):
+		"""
+		Class constructor, initialize all members.
+		"""
+		# TODO: rename pattern variable
 		self.pattern = pattern
 		self.rePattern = rePattern
 
 
 	def __str__(self):
+		"""
+		Return a string representation of the pattern.
+		"""
 		return self.pattern
 
 
@@ -269,7 +328,14 @@ class Pattern:
 ####
 
 class Summary:
+	"""
+	Container to store a summary of the comments searching.
+	"""
+
 	def __init__(self, parameters):
+		"""
+		Class constructor, initialize all members to zero or empty lists.
+		"""
 		self.totalFiles = 0
 		self.totalDirectories = 0
 
@@ -284,7 +350,14 @@ class Summary:
 ####
 
 class CommentsSearch:
+	"""
+	Search comments in the source files.
+	"""
+
 	def __init__(self, parameters, logger):
+		"""
+		Class constructor, prepare the object for searching.
+		"""
 		self.parameters = parameters
 		self.logger = logger
 		self.comments = []
@@ -306,15 +379,24 @@ class CommentsSearch:
 
 
 	def search(self):
+		"""
+		Recursively search the comments according to the input parameters.
+		"""
 		self.processDirectories()
 
 
 	def processDirectories(self):
+		"""
+		Process all directories.
+		"""
 		for directory in self.parameters.directories:
 			self.processDirectory(directory, directory)
 
 
 	def isDirectorySuppressed(self, directory, dirName):
+		"""
+		Return true if the input directory should be skipped, otherwise false.
+		"""
 		if self.parameters.suppressed is None:
 			return False
 
@@ -323,11 +405,8 @@ class CommentsSearch:
 
 	def processDirectory(self, directory, dirName):
 		'''
-		Recursively search files in specified directories.
-
-		:param directory: the directory to search the files in
+		Recursively search files in the input directory.
 		'''
-
 		if not os.path.isdir(directory):
 			self.logger.verbose('Skipping directory (not a directory): {0}'.format(directory))
 			return
@@ -348,6 +427,9 @@ class CommentsSearch:
 
 
 	def isFileExtensionAllowed(self, file):
+		"""
+		Return true if the input file should be processed, otherwise false.
+		"""
 		if self.parameters.extensions is None:
 			return True
 
@@ -359,6 +441,11 @@ class CommentsSearch:
 
 
 	def isFileBinary(self, file):
+		"""
+		Return true if the input file is considered as binary, otherwise false.
+		Note the return value may be incorrect, only beginning of the file is
+		examined for '\0' character.
+		"""
 		CHUNK_SIZE = 1024
 
 		try:
@@ -368,7 +455,7 @@ class CommentsSearch:
 			self.logger.warn('Reading from file failed: {0}, {1}'.format(file, e))
 			return True
 
-		# If the begin of the file contains a null byte, guess that the file is binary.
+		# If the beginning of the file contains a null byte, guess that the file is binary.
 		# GNU grep works similarly, see file_is_binary() in its source codes.
 		#
 		# The following works nicely for common ascii/utf8 encoded source codes
@@ -380,6 +467,9 @@ class CommentsSearch:
 
 
 	def processFile(self, file):
+		'''
+		Process all lines of the input file.
+		'''
 		if not self.isFileExtensionAllowed(file):
 			self.logger.verbose('Skipping file (file extension): {0}'.format(file))
 			return
@@ -408,6 +498,9 @@ class CommentsSearch:
 
 
 	def containsComment(self, line):
+		"""
+		Return true if the input line contains a comment, otherwise false.
+		"""
 		for comment in self.parameters.comments:
 			if line.count(comment) > 0:
 				return True
@@ -416,6 +509,9 @@ class CommentsSearch:
 
 
 	def processLine(self, file, pos, line, lines):
+		'''
+		Process the input line, search comment with one of the specified patterns.
+		'''
 		if not self.containsComment(line):
 			return
 
@@ -429,6 +525,9 @@ class CommentsSearch:
 
 
 	def getLines(self, lines, pos, num):
+		'''
+		Return content of the specified number of lines.
+		'''
 		lastLine = pos+num
 		if lastLine >= len(lines):
 			lastLine = len(lines)
@@ -444,12 +543,23 @@ class CommentsSearch:
 ####
 
 class OutputWriter:
+	"""
+	Write the results of the searching to the output files in specified formats.
+	"""
+
 	def __init__(self, parameters, logger):
+		"""
+		Class constructor.
+		"""
 		self.parameters = parameters
 		self.logger = logger
 
 
 	def output(self, commentsSearch):
+		"""
+		Determine which formats are requested and store them to the appropriate
+		files. If no output file is specified, use the standard output stream.
+		"""
 		outputWritten = False
 
 		self.logger.verbose('') # New line to split the output
@@ -471,13 +581,10 @@ class OutputWriter:
 			self.outputData(sys.stdout, TxtFormatter(self.parameters.numLines > 1), commentsSearch)
 
 
-	def outputData(self, outStream, formatter, commentsSearch):
-		formatter.writeHeader(outStream)
-		formatter.writeData(outStream, commentsSearch.comments, commentsSearch.summary)
-		formatter.writeFooter(outStream)
-
-
 	def outputDataToFile(self, path, formatter, commentsSearch):
+		"""
+		Open the output file and write the data.
+		"""
 		self.logger.verbose('Writing {0} output: {1}'.format(formatter.getType(), path))
 
 		if os.path.exists(path) and not self.parameters.force:
@@ -492,27 +599,52 @@ class OutputWriter:
 			return
 
 
+	def outputData(self, outStream, formatter, commentsSearch):
+		"""
+		Output the data to the opened stream and use the specified formatter.
+		"""
+		formatter.writeHeader(outStream)
+		formatter.writeData(outStream, commentsSearch.comments, commentsSearch.summary)
+		formatter.writeFooter(outStream)
+
+
 ###############################################################################
 ####
 
 class TxtFormatter:
+	"""
+	Text formatter.
+	"""
+
 	MULTILINE_DELIMITER = '--'
 
 
 	def __init__(self, multiline):
+		"""
+		Class constructor.
+		"""
 		self.multiline = multiline
 
 
 	def getType(self):
+		"""
+		Return type of the formatter.
+		"""
 		return 'TXT'
 
 
 	def writeHeader(self, outStream):
+		"""
+		Write the header to the output stream.
+		"""
 		# Empty
 		pass
 
 
 	def writeData(self, outStream, comments, summary):
+		"""
+		Write the data to the output stream.
+		"""
 		if self.multiline:
 			print >> outStream, self.MULTILINE_DELIMITER
 
@@ -528,6 +660,9 @@ class TxtFormatter:
 
 
 	def writeFooter(self, outStream):
+		"""
+		Write the footer to the output stream.
+		"""
 		# Empty
 		pass
 
@@ -538,15 +673,28 @@ class TxtFormatter:
 # TODO: summary in XML
 
 class XmlFormatter:
+	"""
+	XML formatter.
+	"""
+
 	def __init__(self, parameters):
+		"""
+		Class constructor.
+		"""
 		self.parameters = parameters
 
 
 	def getType(self):
+		"""
+		Return type of the formatter.
+		"""
 		return 'XML'
 
 
 	def writeHeader(self, outStream):
+		"""
+		Write the header to the output stream.
+		"""
 		print >> outStream, '<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(self.parameters.encoding)
 		print >> outStream, '<Todos>'
 		print >> outStream, '\t<Version todos="{0}" format="{1}">'.format(TODOS_VERSION, XML_VERSION)
@@ -554,6 +702,9 @@ class XmlFormatter:
 
 
 	def writeData(self, outStream, comments, summary):
+		"""
+		Write the data to the output stream.
+		"""
 		for comment in comments:
 			print >> outStream, '\t\t<Comment pattern="{0}" file="{1}" line="{2}">'.format(
 					self.xmlSpecialChars(comment.pattern),
@@ -568,11 +719,17 @@ class XmlFormatter:
 
 
 	def writeFooter(self, outStream):
+		"""
+		Write the footer to the output stream.
+		"""
 		print >> outStream, '\t</Comments>'
 		print >> outStream, '</Todos>'
 
 
 	def xmlSpecialChars(self, text):
+		"""
+		Replace all special characters by the XML entities and return a new string.
+		"""
 		ret = text
 		ret = ret.replace('&', '&amp;')
 		ret = ret.replace('"', '&quot;')
@@ -585,15 +742,28 @@ class XmlFormatter:
 ####
 
 class HtmlFormatter:
+	"""
+	HTML formatter.
+	"""
+
 	def __init__(self, parameters):
+		"""
+		Class constructor.
+		"""
 		self.parameters = parameters
 
 
 	def getType(self):
+		"""
+		Return type of the formatter.
+		"""
 		return 'HTML'
 
 
 	def writeHeader(self, outStream):
+		"""
+		Write the header to the output stream.
+		"""
 		print >> outStream, '''<?xml version="1.0" encoding="{0}"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
@@ -645,6 +815,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeData(self, outStream, comments, summary):
+		"""
+		Write the data to the output stream.
+		"""
 		print >> outStream, '<div id="sidebar">'
 
 		self.writeToc(outStream)
@@ -677,6 +850,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeToc(self, outStream):
+		"""
+		Write table of contents as menu.
+		"""
 		print >> outStream, '''
 <div class="menu_title">Menu</div>
 
@@ -699,6 +875,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeInputParameters(self, outStream):
+		"""
+		Write input parameters as a table.
+		"""
 		rows = [['Computer', self.htmlSpecialChars(socket.gethostname())],
 				['User', self.htmlSpecialChars(os.environ['LOGNAME'])],
 				['Python', self.htmlSpecialChars('.'.join([str(v) for v in sys.version_info[0:3]]))],
@@ -729,6 +908,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeGeneralSummary(self, outStream, summary):
+		"""
+		Write summary as a table.
+		"""
 		numFilesWithMatches = 0
 		for file, count in summary.perFile.iteritems():
 			if count != 0:
@@ -743,16 +925,23 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writePerPattern(self, outStream, perPattern):
+		"""
+		Write table of the input patterns together with the number of their occurrences.
+		"""
 		rows = [[self.htmlSpecialChars(p), c] for p, c in perPattern.iteritems()]
 		rows.sort(key=itemgetter(1), reverse=True)
 		self.htmlTable(outStream, ['Pattern', 'Occurrences'], rows)
 
 
 	def writePerFile(self, outStream, perFile):
+		"""
+		Write table of the input files together with the number of the occurrences.
+		Skip files with no occurrences.
+		"""
 		rows = []
 
 		for file, count in perFile.iteritems():
-			if count != 0:
+			if count > 0:
 				rows.append([self.htmlLink(os.path.abspath(file), file), count])
 
 		rows.sort(key=itemgetter(1), reverse=True)
@@ -760,6 +949,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeComments(self, outStream, comments):
+		"""
+		Write table of all occurrences with all details.
+		"""
 		rows = []
 
 		for comment in comments:
@@ -772,6 +964,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def writeFooter(self, outStream):
+		"""
+		Write the footer to the output stream.
+		"""
 		print >> outStream, '<p id="footer">Page generated: {0}, {1}, {2}.</p>'.format(
 				strftime("%Y-%m-%d %H:%M:%S", localtime()),
 				self.htmlLink('http://todos.sourceforge.net/', 'todos'),
@@ -782,6 +977,9 @@ tr:hover    { background-color: #C0C0FF; }
 
 
 	def htmlSpecialChars(self, text):
+		"""
+		Replace all special characters by the HTML entities and return a new string.
+		"""
 		ret = text
 		ret = ret.replace('&', '&amp;')
 		ret = ret.replace('"', '&quot;')
@@ -790,14 +988,20 @@ tr:hover    { background-color: #C0C0FF; }
 		return ret
 
 
-	def htmlLink(self, destination, text):
+	def htmlLink(self, target, text):
+		"""
+		Return a HTML link constructed from a target address and a label.
+		"""
 		return '<a href="{0}">{1}</a>'.format(
-				self.htmlSpecialChars(destination),
+				self.htmlSpecialChars(target),
 				self.htmlSpecialChars(text)
 		)
 
 
 	def htmlTable(self, outStream, headers, rows):
+		"""
+		Write a HTML table to the output stream.
+		"""
 		print >> outStream, '<table>\n<thead>\n<tr>'
 
 		for header in headers:
