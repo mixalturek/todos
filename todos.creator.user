@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.6.1, 2013-06-11T21:30:48. -->
+<!-- Written by Qt Creator 2.6.1, 2013-06-23T15:49:32. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -148,7 +148,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">src/todos.py -f -e '\bTODO\b' '\bFIXME\b' '\bOPEN\b' '@[a-zA-Z]{2,3}@' -A 5 -o build/todos.txt -x build/todos.xml -m build/todos.html ~/down/s/</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">todos/todos.py -f -e '\bTODO\b' '\bFIXME\b' '\bOPEN\b' '@[a-zA-Z]{2,3}@' -A 5 -o build/todos.txt -x build/todos.xml -m build/todos.html ~/down/s/</value>
     <value type="int" key="ProjectExplorer.CustomExecutableRunConfiguration.BaseEnvironmentBase">2</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">python</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
@@ -195,7 +195,7 @@
      <value type="int">13</value>
      <value type="int">14</value>
     </valuelist>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">src/todos.py -v -f -D .git build -o build/todos.txt -x build/todos.xml -m build/todos.html</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">todos/todos.py -v -f -D .git build -o build/todos.txt -x build/todos.xml -m build/todos.html</value>
     <value type="int" key="ProjectExplorer.CustomExecutableRunConfiguration.BaseEnvironmentBase">2</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">python</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>

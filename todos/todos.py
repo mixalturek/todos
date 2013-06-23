@@ -90,7 +90,8 @@ class Todos:
         """
         parser = argparse.ArgumentParser(
                 prog='todos',
-                description='Search project directory for TODO, FIXME and similar comments.',
+                description='Search project directory for TODO, FIXME '
+                        'and similar comments.',
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
 
@@ -120,7 +121,8 @@ class Todos:
         parser.add_argument(
                 '-e', '--regexp',
                 nargs='+',
-                help="the pattern to search; see Python's re module for proper syntax",
+                help='the pattern to search; see Python re module for '
+                        'proper syntax',
                 metavar='PATTERN',
                 dest='patterns',
                 default=PATTERNS
@@ -131,7 +133,8 @@ class Todos:
                 type=int,
                 metavar='NUM',
                 dest='num_lines',
-                help='number of lines that are sent to the output together with the matching line',
+                help='number of lines that are sent to the output together '
+                        'with the matching line',
                 default=NUM_LINES
         )
 
@@ -169,7 +172,8 @@ class Todos:
                 '-o', '--out-txt',
                 metavar='TXT',
                 dest='out_txt',
-                help='the output text file; standard output will be used if the path is not specified'
+                help='the output text file; standard output will be used if '
+                        'the path is not specified'
         )
 
         parser.add_argument(
@@ -223,7 +227,8 @@ class Todos:
         self.logger.verbose('comments: {0}'.format(parameters.comments))
         self.logger.verbose('patterns: {0}'.format(parameters.patterns))
         self.logger.verbose('extensions: {0}'.format(parameters.extensions))
-        self.logger.verbose('suppressed-dirs: {0}'.format(parameters.suppressed))
+        self.logger.verbose('suppressed-dirs: {0}'.format(
+        parameters.suppressed))
         self.logger.verbose('encoding: {0}'.format(parameters.encoding))
         self.logger.verbose('ignore-case: {0}'.format(parameters.ignore_case))
         self.logger.verbose('num-lines: {0}'.format(parameters.num_lines))
@@ -243,7 +248,8 @@ class Todos:
             codecs.lookup(parameters.encoding)
         except LookupError as e:
             self.logger.warn('Encoding error: {0}'.format(e))
-            self.logger.warn('Changing encoding to default: {0}'.format(ENCODING))
+            self.logger.warn('Changing encoding to default: {0}'.
+                    format(ENCODING))
             parameters.encoding = ENCODING
 
         if parameters.extensions is not None:
@@ -409,9 +415,12 @@ class CommentsSearch:
         self.parameters.compiled_patterns = []
         for str_pattern in self.parameters.patterns:
             try:
-                self.parameters.compiled_patterns.append(Pattern(str_pattern, re.compile(str_pattern, flags)))
+                self.parameters.compiled_patterns.append(
+                        Pattern(str_pattern, re.compile(str_pattern, flags))
+                )
             except re.error as e:
-                self.logger.warn('Pattern compilation failed: {0}, {1}'.format(str_pattern, e))
+                self.logger.warn('Pattern compilation failed: {0}, {1}'.
+                        format(str_pattern, e))
 
 
     def search(self):
@@ -444,11 +453,13 @@ class CommentsSearch:
         Recursively search files in the input directory.
         '''
         if not os.path.isdir(directory):
-            self.logger.verbose('Skipping directory (not a directory): {0}'.format(directory))
+            self.logger.verbose('Skipping directory (not a directory): {0}'.
+                    format(directory))
             return
 
         if self.is_directory_suppressed(directory, dirName):
-            self.logger.verbose('Skipping directory (suppressed): {0}'.format(directory))
+            self.logger.verbose('Skipping directory (suppressed): {0}'.
+                    format(directory))
             return
 
         self.summary.total_directories += 1
@@ -488,17 +499,20 @@ class CommentsSearch:
             with open(file, 'rb') as f:
                 chunk = f.read(CHUNK_SIZE)
         except IOError as e:
-            self.logger.warn('Reading from file failed: {0}, {1}'.format(file, e))
+            self.logger.warn('Reading from file failed: {0}, {1}'.
+                    format(file, e))
             return True
 
-        # If the beginning of the file contains a null byte, guess that the file is binary.
-        # GNU grep works similarly, see file_is_binary() in its source codes.
+        # If the beginning of the file contains a null byte, guess that the
+        # file is binary. GNU grep works similarly, see file_is_binary()
+        # in its source codes.
         #
         # The following works nicely for common ascii/utf8 encoded source codes
-        # with binary object files, images and jar packages in the same directory tree.
-        # The heuristic can be extended in future if needed,
+        # with binary object files, images and jar packages in the same
+        # directory tree. The heuristic can be extended in future if needed,
         #
-        # Note UTF-16 encoded text files will be clasified as binary, is it correct/incorrect?
+        # Note UTF-16 encoded text files will be clasified as binary,
+        # is it correct/incorrect?
         return '\0' in chunk
 
 
@@ -507,7 +521,8 @@ class CommentsSearch:
         Process all lines of the input file.
         '''
         if not self.is_file_extension_allowed(file):
-            self.logger.verbose('Skipping file (file extension): {0}'.format(file))
+            self.logger.verbose('Skipping file (file extension): {0}'.
+                    format(file))
             return
 
         if self.is_file_binary(file):
@@ -528,7 +543,8 @@ class CommentsSearch:
                 position += 1
                 self.process_line(file, position, line, lines)
         except IOError as e:
-            self.logger.warn('Reading from file failed: {0}, {1}'.format(file, e))
+            self.logger.warn('Reading from file failed: {0}, {1}'.
+                    format(file, e))
         except UnicodeError as e:
             self.logger.warn('Skipping file (unicode error): {0}'.format(file))
 
@@ -546,15 +562,18 @@ class CommentsSearch:
 
     def process_line(self, file, position, line, lines):
         '''
-        Process the input line, search comment with one of the specified patterns.
+        Process the input line, search comment with one of the specified
+        patterns.
         '''
         if not self.contains_comment(line):
             return
 
         for pattern in self.parameters.compiled_patterns:
             if pattern.re_pattern.search(line):
-                lines_to_store = self.get_lines(lines, position-1, self.parameters.num_lines)
-                self.comments.append(Comment(pattern.str_pattern, file, position, lines_to_store))
+                lines_to_store = self.get_lines(lines, position-1,
+                        self.parameters.num_lines)
+                self.comments.append(Comment(pattern.str_pattern, file,
+                        position, lines_to_store))
                 self.summary.per_pattern[pattern.str_pattern] += 1
                 self.summary.per_file[file] += 1
                 break
@@ -605,30 +624,38 @@ class OutputWriter:
         self.logger.verbose('') # New line to split the output
 
         if self.parameters.out_txt is not None:
-            self.output_data_to_file(self.parameters.out_txt, TxtFormatter(self.parameters.num_lines > 1), comments_search)
+            self.output_data_to_file(self.parameters.out_txt,
+                    TxtFormatter(self.parameters.num_lines > 1),
+                    comments_search)
             output_written = True
 
         if self.parameters.out_xml is not None:
-            self.output_data_to_file(self.parameters.out_xml, XmlFormatter(self.parameters), comments_search)
+            self.output_data_to_file(self.parameters.out_xml,
+                    XmlFormatter(self.parameters), comments_search)
             output_written = True
 
         if self.parameters.out_html is not None:
-            self.output_data_to_file(self.parameters.out_html, HtmlFormatter(self.parameters), comments_search)
+            self.output_data_to_file(self.parameters.out_html,
+                    HtmlFormatter(self.parameters), comments_search)
             output_written = True
 
         # Use stdout if no output method is explicitly specified
         if output_written == False:
-            self.output_data(sys.stdout, TxtFormatter(self.parameters.num_lines > 1), comments_search)
+            self.output_data(sys.stdout,
+                    TxtFormatter(self.parameters.num_lines > 1),
+                    comments_search)
 
 
     def output_data_to_file(self, path, formatter, comments_search):
         """
         Open the output file and write the data.
         """
-        self.logger.verbose('Writing {0} output: {1}'.format(formatter.get_type(), path))
+        self.logger.verbose('Writing {0} output: {1}'.
+                format(formatter.get_type(), path))
 
         if os.path.exists(path) and not self.parameters.force:
-            self.logger.warn('File exists, use force parameter to override: {0}'.format(file))
+            self.logger.warn('File exists, use force parameter to '
+                    'override: {0}'.format(file))
             return
 
         try:
@@ -644,7 +671,8 @@ class OutputWriter:
         Output the data to the opened stream and use the specified formatter.
         """
         formatter.write_header(out_stream)
-        formatter.write_data(out_stream, comments_search.comments, comments_search.summary)
+        formatter.write_data(out_stream, comments_search.comments,
+                comments_search.summary)
         formatter.write_footer(out_stream)
 
 
@@ -694,7 +722,8 @@ class TxtFormatter:
             position = comment.position
 
             for line in comment.lines:
-                print >> out_stream, '{0}:{1}: {2}'.format(comment.file, position, line)
+                print >> out_stream, '{0}:{1}: {2}'.format(
+                        comment.file, position, line)
                 position += 1
 
             if self.multiline:
@@ -739,9 +768,12 @@ class XmlFormatter:
         """
         Write the header to the output stream.
         """
-        print >> out_stream, '<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(self.parameters.encoding)
+        print >> out_stream, '<?xml version="1.0" encoding="{0}" '
+        'standalone="yes"?>'.format(self.parameters.encoding)
+
         print >> out_stream, '<Todos>'
-        print >> out_stream, '\t<Version todos="{0}" format="{1}">'.format(TODOS_VERSION, XML_VERSION)
+        print >> out_stream, '\t<Version todos="{0}" format="{1}">'.format(
+                TODOS_VERSION, XML_VERSION)
         print >> out_stream, '\t<Comments>'
 
 
@@ -750,14 +782,15 @@ class XmlFormatter:
         Write the data to the output stream.
         """
         for comment in comments:
-            print >> out_stream, '\t\t<Comment pattern="{0}" file="{1}" line="{2}">'.format(
+            print >> out_stream, '\t\t<Comment pattern="{0}" file="{1}" '
+            'line="{2}">'.format(
                     self.xml_special_chars(comment.str_pattern),
                     self.xml_special_chars(comment.file),
-                    comment.position
-            )
+                    comment.position)
 
             for line in comment.lines:
-                print >> out_stream, '\t\t\t{0}'.format(self.xml_special_chars(line))
+                print >> out_stream, '\t\t\t{0}'.format(
+                        self.xml_special_chars(line))
 
             print >> out_stream, '\t\t</Comment>'
 
@@ -772,7 +805,8 @@ class XmlFormatter:
 
     def xml_special_chars(self, text):
         """
-        Replace all special characters by the XML entities and return a new string.
+        Replace all special characters by the XML entities and
+        return a new string.
         """
         ret = text
         ret = ret.replace('&', '&amp;')
@@ -811,7 +845,8 @@ class HtmlFormatter:
         Write the header to the output stream.
         """
         print >> out_stream, '''<?xml version="1.0" encoding="{0}"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
@@ -842,7 +877,8 @@ tr:hover    { background-color: #C0C0FF; }
 
 #page       { margin-left: 17%; }
 #sidebar    { position: fixed; top: 0px; left: 0px; width: 15%; padding: 2em; }
-#footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver; color: gray; clear: both; }
+#footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver;
+              color: gray; clear: both; }
 
 #sidebar .menu_title { font-weight: bold; font-size: 14pt; }
 #sidebar ul { margin-left: 1em; padding-left: 0px; }
@@ -926,29 +962,45 @@ tr:hover    { background-color: #C0C0FF; }
         """
         rows = [['Computer', self.html_special_chars(socket.gethostname())],
                 ['User', self.html_special_chars(os.environ['LOGNAME'])],
-                ['Python', self.html_special_chars('.'.join([str(v) for v in sys.version_info[0:3]]))],
+                ['Python', self.html_special_chars('.'.join(
+                        [str(v) for v in sys.version_info[0:3]]))],
         ]
         self.html_table(out_stream, ['Parameter', 'Value'], rows)
 
         print >> out_stream, '<pre>'
-        print >> out_stream, 'cd {0}'.format(self.html_special_chars(os.getcwd()))
+        print >> out_stream, 'cd {0}'.format(
+                self.html_special_chars(os.getcwd()))
         print >> out_stream, self.html_special_chars(' '.join(sys.argv))
         print >> out_stream, '</pre>\n'
 
-        rows = [['Working Directory', self.html_special_chars(os.getcwd())],
-                ['Verbose', self.html_special_chars(str(self.parameters.verbose))],
-                ['Comments', self.html_special_chars(str(self.parameters.comments))],
-                ['Patterns', self.html_special_chars(str(self.parameters.patterns))],
-                ['Extensions', self.html_special_chars(str(self.parameters.extensions))],
-                ['Suppressed Directories', self.html_special_chars(str(self.parameters.suppressed))],
-                ['Encoding', self.html_special_chars(str(self.parameters.encoding))],
-                ['Ignore Case', self.html_special_chars(str(self.parameters.ignore_case))],
-                ['Number of Lines', self.html_special_chars(str(self.parameters.num_lines))],
-                ['Output TXT File', self.html_special_chars(str(self.parameters.out_txt))],
-                ['Output XML File', self.html_special_chars(str(self.parameters.out_xml))],
-                ['Output HTML File', self.html_special_chars(str(self.parameters.out_html))],
-                ['Force', self.html_special_chars(str(self.parameters.force))],
-                ['Directories', self.html_special_chars(str(self.parameters.directories))],
+        rows = [['Working Directory', self.html_special_chars(
+                        os.getcwd())],
+                ['Verbose', self.html_special_chars(
+                        str(self.parameters.verbose))],
+                ['Comments', self.html_special_chars(
+                        str(self.parameters.comments))],
+                ['Patterns', self.html_special_chars(
+                        str(self.parameters.patterns))],
+                ['Extensions', self.html_special_chars(
+                        str(self.parameters.extensions))],
+                ['Suppressed Directories', self.html_special_chars(
+                        str(self.parameters.suppressed))],
+                ['Encoding', self.html_special_chars(
+                        str(self.parameters.encoding))],
+                ['Ignore Case', self.html_special_chars(
+                        str(self.parameters.ignore_case))],
+                ['Number of Lines', self.html_special_chars(
+                        str(self.parameters.num_lines))],
+                ['Output TXT File', self.html_special_chars(
+                        str(self.parameters.out_txt))],
+                ['Output XML File', self.html_special_chars(
+                        str(self.parameters.out_xml))],
+                ['Output HTML File', self.html_special_chars(
+                        str(self.parameters.out_html))],
+                ['Force', self.html_special_chars(
+                        str(self.parameters.force))],
+                ['Directories', self.html_special_chars(
+                        str(self.parameters.directories))],
         ]
         self.html_table(out_stream, ['Parameter', 'Value'], rows)
 
@@ -972,17 +1024,19 @@ tr:hover    { background-color: #C0C0FF; }
 
     def write_per_pattern(self, out_stream, per_pattern):
         """
-        Write table of the input patterns together with the number of their occurrences.
+        Write table of the input patterns together with the number of their
+        occurrences.
         """
-        rows = [[self.html_special_chars(str_pattern), comment] for str_pattern, comment in per_pattern.iteritems()]
+        rows = [[self.html_special_chars(str_pattern), comment]
+                for str_pattern, comment in per_pattern.iteritems()]
         rows.sort(key=itemgetter(1), reverse=True)
         self.html_table(out_stream, ['Pattern', 'Occurrences'], rows)
 
 
     def write_per_file(self, out_stream, per_file):
         """
-        Write table of the input files together with the number of the occurrences.
-        Skip files with no occurrences.
+        Write table of the input files together with the number of the
+        occurrences. Skip files with no occurrences.
         """
         rows = []
 
@@ -1003,28 +1057,30 @@ tr:hover    { background-color: #C0C0FF; }
         for comment in comments:
             file = self.htmlLink(os.path.abspath(comment.file), comment.file)
             str_pattern = self.html_special_chars(comment.str_pattern)
-            content = '<pre>{0}</pre>'.format(self.html_special_chars('\n'.join(comment.lines)))
+            content = '<pre>{0}</pre>'.format(self.html_special_chars(
+                    '\n'.join(comment.lines)))
             rows.append([file, comment.position, str_pattern, content])
 
-        self.html_table(out_stream, ['File', 'Line', 'Pattern', 'Content'], rows)
+        self.html_table(out_stream, ['File', 'Line', 'Pattern', 'Content'],
+                rows)
 
 
     def write_footer(self, out_stream):
         """
         Write the footer to the output stream.
         """
-        print >> out_stream, '<p id="footer">Page generated: {0}, {1}, {2}.</p>'.format(
-                strftime("%Y-%m-%d %H:%M:%S", localtime()),
+        print >> out_stream, '<p id="footer">Page generated: {0}, {1}, {2}.'
+        '</p>'.format(strftime("%Y-%m-%d %H:%M:%S", localtime()),
                 self.htmlLink('http://todos.sourceforge.net/', 'todos'),
-                TODOS_VERSION
-        )
+                TODOS_VERSION)
         print >> out_stream, '</body>'
         print >> out_stream, '</html>'
 
 
     def html_special_chars(self, text):
         """
-        Replace all special characters by the HTML entities and return a new string.
+        Replace all special characters by the HTML entities and return a new
+        string.
         """
         ret = text
         ret = ret.replace('&', '&amp;')
