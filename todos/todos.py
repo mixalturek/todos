@@ -74,7 +74,6 @@ class Todos:
         """
         parameters = self.parse_command_line_arguments(argv)
         self.logger = Logger(parameters.verbose)
-        self.verify_parameters(parameters)
         self.dump_parameters(parameters)
 
         comments_search = CommentsSearch(parameters, self.logger)
@@ -210,6 +209,8 @@ class Todos:
 
         # Workaround for ValueError: dest supplied twice for positional argument
         parameters.directories = parameters.directory
+
+        self.verify_parameters(parameters)
 
         return parameters
 
