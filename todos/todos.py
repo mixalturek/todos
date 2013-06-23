@@ -246,8 +246,8 @@ class Todos:
         """
         try:
             codecs.lookup(parameters.encoding)
-        except LookupError as e:
-            self.logger.warn('Encoding error: {0}'.format(e))
+        except LookupError as lookup_exception:
+            self.logger.warn('Encoding error: {0}'.format(lookup_exception))
             self.logger.warn('Changing encoding to default: {0}'.
                     format(ENCODING))
             parameters.encoding = ENCODING
@@ -312,14 +312,14 @@ class Comment:
     Container to store one comment that was found.
     """
 
-    def __init__(self, str_pattern, file, position, lines):
+    def __init__(self, str_pattern, path, position, lines):
         """
         Class constructor, initialize all members.
         """
         self.str_pattern = str_pattern
         # """ The pattern that was searched and found. """
 
-        self.file = file
+        self.path = path
         # """ The input file. """
 
         self.position = position
@@ -473,7 +473,7 @@ class CommentsSearch:
                 self.process_directory(path, item)
 
 
-    def is_file_extension_allowed(self, file):
+    def is_file_extension_allowed(self, path):
         """
         Return true if the input file should be processed, otherwise false.
         """
@@ -481,13 +481,13 @@ class CommentsSearch:
             return True
 
         for extension in self.parameters.extensions:
-            if file.endswith(extension):
+            if path.endswith(extension):
                 return True
 
         return False
 
 
-    def is_file_binary(self, file):
+    def is_file_binary(self, path):
         """
         Return true if the input file is considered as binary, otherwise false.
         Note the return value may be incorrect, only beginning of the file is
@@ -496,11 +496,11 @@ class CommentsSearch:
         CHUNK_SIZE = 1024
 
         try:
-            with open(file, 'rb') as f:
+            with open(path, 'rb') as f:
                 chunk = f.read(CHUNK_SIZE)
         except IOError as e:
             self.logger.warn('Reading from file failed: {0}, {1}'.
-                    format(file, e))
+                    format(path, e))
             return True
 
         # If the beginning of the file contains a null byte, guess that the
@@ -516,37 +516,37 @@ class CommentsSearch:
         return '\0' in chunk
 
 
-    def process_file(self, file):
+    def process_file(self, path):
         '''
         Process all lines of the input file.
         '''
-        if not self.is_file_extension_allowed(file):
+        if not self.is_file_extension_allowed(path):
             self.logger.verbose('Skipping file (file extension): {0}'.
-                    format(file))
+                    format(path))
             return
 
-        if self.is_file_binary(file):
-            self.logger.verbose('Skipping file (binary file): {0}'.format(file))
+        if self.is_file_binary(path):
+            self.logger.verbose('Skipping file (binary file): {0}'.format(path))
             return
 
-        self.logger.verbose('Parsing file: {0}'.format(file))
+        self.logger.verbose('Parsing file: {0}'.format(path))
 
         try:
-            with codecs.open(file, 'r', self.parameters.encoding) as f:
+            with codecs.open(path, 'r', self.parameters.encoding) as f:
                 lines = f.readlines()
 
             self.summary.total_files += 1
-            self.summary.per_file[file] = 0
+            self.summary.per_file[path] = 0
 
             position = 0
             for line in lines:
                 position += 1
-                self.process_line(file, position, line, lines)
+                self.process_line(path, position, line, lines)
         except IOError as e:
             self.logger.warn('Reading from file failed: {0}, {1}'.
-                    format(file, e))
+                    format(path, e))
         except UnicodeError as e:
-            self.logger.warn('Skipping file (unicode error): {0}'.format(file))
+            self.logger.warn('Skipping file (unicode error): {0}'.format(path))
 
 
     def contains_comment(self, line):
@@ -560,7 +560,7 @@ class CommentsSearch:
         return False
 
 
-    def process_line(self, file, position, line, lines):
+    def process_line(self, path, position, line, lines):
         '''
         Process the input line, search comment with one of the specified
         patterns.
@@ -572,10 +572,10 @@ class CommentsSearch:
             if pattern.re_pattern.search(line):
                 lines_to_store = self.get_lines(lines, position-1,
                         self.parameters.num_lines)
-                self.comments.append(Comment(pattern.str_pattern, file,
+                self.comments.append(Comment(pattern.str_pattern, path,
                         position, lines_to_store))
                 self.summary.per_pattern[pattern.str_pattern] += 1
-                self.summary.per_file[file] += 1
+                self.summary.per_file[path] += 1
                 break
 
 
@@ -655,14 +655,14 @@ class OutputWriter:
 
         if os.path.exists(path) and not self.parameters.force:
             self.logger.warn('File exists, use force parameter to '
-                    'override: {0}'.format(file))
+                    'override: {0}'.format(path))
             return
 
         try:
             with codecs.open(path, 'w', self.parameters.encoding) as out_stream:
                 self.output_data(out_stream, formatter, comments_search)
         except IOError as e:
-            self.logger.error('Output failed: {0}, {1}'.format(file, e))
+            self.logger.error('Output failed: {0}, {1}'.format(path, e))
             return
 
 
@@ -723,7 +723,7 @@ class TxtFormatter:
 
             for line in comment.lines:
                 print >> out_stream, '{0}:{1}: {2}'.format(
-                        comment.file, position, line)
+                        comment.path, position, line)
                 position += 1
 
             if self.multiline:
@@ -785,7 +785,7 @@ class XmlFormatter:
             print >> out_stream, '\t\t<Comment pattern="{0}" file="{1}" '
             'line="{2}">'.format(
                     self.xml_special_chars(comment.str_pattern),
-                    self.xml_special_chars(comment.file),
+                    self.xml_special_chars(comment.path),
                     comment.position)
 
             for line in comment.lines:
@@ -1010,7 +1010,7 @@ tr:hover    { background-color: #C0C0FF; }
         Write summary as a table.
         """
         num_files_with_matches = 0
-        for file, count in summary.per_file.iteritems():
+        for path, count in summary.per_file.iteritems():
             if count != 0:
                 num_files_with_matches += 1
 
@@ -1040,9 +1040,9 @@ tr:hover    { background-color: #C0C0FF; }
         """
         rows = []
 
-        for file, count in per_file.iteritems():
+        for path, count in per_file.iteritems():
             if count > 0:
-                rows.append([self.htmlLink(os.path.abspath(file), file), count])
+                rows.append([self.htmlLink(os.path.abspath(path), path), count])
 
         rows.sort(key=itemgetter(1), reverse=True)
         self.html_table(out_stream, ['File', 'Occurrences'], rows)
@@ -1055,11 +1055,11 @@ tr:hover    { background-color: #C0C0FF; }
         rows = []
 
         for comment in comments:
-            file = self.htmlLink(os.path.abspath(comment.file), comment.file)
+            path = self.htmlLink(os.path.abspath(comment.path), comment.path)
             str_pattern = self.html_special_chars(comment.str_pattern)
             content = '<pre>{0}</pre>'.format(self.html_special_chars(
                     '\n'.join(comment.lines)))
-            rows.append([file, comment.position, str_pattern, content])
+            rows.append([path, comment.position, str_pattern, content])
 
         self.html_table(out_stream, ['File', 'Line', 'Pattern', 'Content'],
                 rows)
@@ -1130,5 +1130,5 @@ if __name__ == '__main__':
     try:
         todos = Todos()
         todos.main(sys.argv[1:])
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt as keyboard_exception:
         sys.exit('\nERROR: Interrupted by user')

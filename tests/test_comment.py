@@ -30,8 +30,8 @@ import todos.todos as todos
 
 class CommentTestCase(unittest.TestCase):
     def test_constructor(self):
-        comment = todos.Comment('str_pattern', 'file', 42, ['line 1', 'line 2'])
+        comment = todos.Comment('str_pattern', 'path', 42, ['line 1', 'line 2'])
         self.assertEqual('str_pattern', comment.str_pattern)
-        self.assertEqual('file', comment.file)
+        self.assertEqual('path', comment.path)
         self.assertEqual(42, comment.position)
         self.assertEqual(['line 1', 'line 2'], comment.lines)
