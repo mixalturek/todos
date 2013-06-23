@@ -1,6 +1,7 @@
 ./COPYING
 ./Doxyfile
 ./Makefile
+./src/test_comment.py
 ./src/todos.py
 ./TODO
 ./todos.config

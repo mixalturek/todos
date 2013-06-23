@@ -32,7 +32,15 @@ all:
 
 
 .PHONY: extra
-extra: doc lines sloccount
+extra: tests doc lines sloccount
+
+
+###############################################################################
+#### Unit tests
+
+.PHONY: tests
+tests:
+	cd src && unit2 discover -v
 
 
 ###############################################################################
@@ -64,6 +72,7 @@ doc:
 .PHONY: qtcreator
 qtcreator:
 	find . -type f \
+		| grep -v '^\./build' \
 		| grep -v '^\./\.' \
 		| grep -v '\.pyc$$' \
 		| sort > todos.files
