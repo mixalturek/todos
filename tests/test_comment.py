@@ -25,12 +25,12 @@ Unit test of Comment class.
 
 
 import unittest
-from todos import Comment
+import todos.todos as todos
 
 
 class CommentTestCase(unittest.TestCase):
 	def test_constructor(self):
-		comment = Comment('str_pattern', 'file', 42, ['line 1', 'line 2'])
+		comment = todos.Comment('str_pattern', 'file', 42, ['line 1', 'line 2'])
 		self.assertEqual('str_pattern', comment.str_pattern)
 		self.assertEqual('file', comment.file)
 		self.assertEqual(42, comment.position)

@@ -32,7 +32,7 @@ all:
 
 
 .PHONY: extra
-extra: tests doc lines sloccount
+extra: tests pylint doc lines sloccount
 
 
 ###############################################################################
@@ -40,7 +40,19 @@ extra: tests doc lines sloccount
 
 .PHONY: tests
 tests:
-	cd src && unit2 discover -v
+	mkdir -p $(BUILD_DIR)
+	nosetests --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive
+
+	# Debian contains too old python-coverage package
+	# python -m coverage xml --include=todos*
+
+
+###############################################################################
+####
+
+.PHONY: pylint
+pylint:
+	pylint -f parseable todos | tee build/pylint.out
 
 
 ###############################################################################
@@ -85,3 +97,4 @@ qtcreator:
 clean:
 	rm -rf $(BUILD_DIR)
 	find . -name '*.pyc' -exec rm {} \;
+	find . -name '.coverage' -exec rm {} \;
