@@ -418,9 +418,9 @@ class CommentsSearch:
                 self.parameters.compiled_patterns.append(
                         Pattern(str_pattern, re.compile(str_pattern, flags))
                 )
-            except re.error as e:
+            except re.error as re_exception:
                 self.logger.warn('Pattern compilation failed: {0}, {1}'.
-                        format(str_pattern, e))
+                        format(str_pattern, re_exception))
 
 
     def search(self):
@@ -438,17 +438,17 @@ class CommentsSearch:
             self.process_directory(directory, directory)
 
 
-    def is_directory_suppressed(self, directory, dirName):
+    def is_directory_suppressed(self, dir_name):
         """
         Return true if the input directory should be skipped, otherwise false.
         """
         if self.parameters.suppressed is None:
             return False
 
-        return dirName in self.parameters.suppressed
+        return dir_name in self.parameters.suppressed
 
 
-    def process_directory(self, directory, dirName):
+    def process_directory(self, directory, dir_name):
         '''
         Recursively search files in the input directory.
         '''
@@ -457,7 +457,7 @@ class CommentsSearch:
                     format(directory))
             return
 
-        if self.is_directory_suppressed(directory, dirName):
+        if self.is_directory_suppressed(dir_name):
             self.logger.verbose('Skipping directory (suppressed): {0}'.
                     format(directory))
             return
@@ -493,14 +493,14 @@ class CommentsSearch:
         Note the return value may be incorrect, only beginning of the file is
         examined for '\0' character.
         """
-        CHUNK_SIZE = 1024
+        const_chunk_size = 1024
 
         try:
-            with open(path, 'rb') as f:
-                chunk = f.read(CHUNK_SIZE)
-        except IOError as e:
+            with open(path, 'rb') as input_file:
+                chunk = input_file.read(const_chunk_size)
+        except IOError as io_exception:
             self.logger.warn('Reading from file failed: {0}, {1}'.
-                    format(path, e))
+                    format(path, io_exception))
             return True
 
         # If the beginning of the file contains a null byte, guess that the
@@ -532,8 +532,8 @@ class CommentsSearch:
         self.logger.verbose('Parsing file: {0}'.format(path))
 
         try:
-            with codecs.open(path, 'r', self.parameters.encoding) as f:
-                lines = f.readlines()
+            with codecs.open(path, 'r', self.parameters.encoding) as input_file:
+                lines = input_file.readlines()
 
             self.summary.total_files += 1
             self.summary.per_file[path] = 0
@@ -542,10 +542,10 @@ class CommentsSearch:
             for line in lines:
                 position += 1
                 self.process_line(path, position, line, lines)
-        except IOError as e:
+        except IOError as io_exception:
             self.logger.warn('Reading from file failed: {0}, {1}'.
-                    format(path, e))
-        except UnicodeError as e:
+                    format(path, io_exception))
+        except UnicodeError:
             self.logger.warn('Skipping file (unicode error): {0}'.format(path))
 
 
@@ -661,8 +661,9 @@ class OutputWriter:
         try:
             with codecs.open(path, 'w', self.parameters.encoding) as out_stream:
                 self.output_data(out_stream, formatter, comments_search)
-        except IOError as e:
-            self.logger.error('Output failed: {0}, {1}'.format(path, e))
+        except IOError as io_exception:
+            self.logger.error('Output failed: {0}, {1}'.format(
+                    path, io_exception))
             return
 
 
@@ -685,7 +686,7 @@ class TxtFormatter:
     """
 
     MULTILINE_DELIMITER = '--'
-    """ Delimiter if multiline output is enabled. """
+    # """ Delimiter if multiline output is enabled. """
 
 
     def __init__(self, multiline):
@@ -1042,7 +1043,8 @@ tr:hover    { background-color: #C0C0FF; }
 
         for path, count in per_file.iteritems():
             if count > 0:
-                rows.append([self.htmlLink(os.path.abspath(path), path), count])
+                rows.append([self.html_link(os.path.abspath(path), path),
+                        count])
 
         rows.sort(key=itemgetter(1), reverse=True)
         self.html_table(out_stream, ['File', 'Occurrences'], rows)
@@ -1055,7 +1057,7 @@ tr:hover    { background-color: #C0C0FF; }
         rows = []
 
         for comment in comments:
-            path = self.htmlLink(os.path.abspath(comment.path), comment.path)
+            path = self.html_link(os.path.abspath(comment.path), comment.path)
             str_pattern = self.html_special_chars(comment.str_pattern)
             content = '<pre>{0}</pre>'.format(self.html_special_chars(
                     '\n'.join(comment.lines)))
@@ -1071,7 +1073,7 @@ tr:hover    { background-color: #C0C0FF; }
         """
         print >> out_stream, '<p id="footer">Page generated: {0}, {1}, {2}.'
         '</p>'.format(strftime("%Y-%m-%d %H:%M:%S", localtime()),
-                self.htmlLink('http://todos.sourceforge.net/', 'todos'),
+                self.html_link('http://todos.sourceforge.net/', 'todos'),
                 TODOS_VERSION)
         print >> out_stream, '</body>'
         print >> out_stream, '</html>'
@@ -1090,7 +1092,7 @@ tr:hover    { background-color: #C0C0FF; }
         return ret
 
 
-    def htmlLink(self, target, text):
+    def html_link(self, target, text):
         """
         Return a HTML link constructed from a target address and a label.
         """
@@ -1128,7 +1130,7 @@ tr:hover    { background-color: #C0C0FF; }
 
 if __name__ == '__main__':
     try:
-        todos = Todos()
-        todos.main(sys.argv[1:])
+        TODOS = Todos()
+        TODOS.main(sys.argv[1:])
     except KeyboardInterrupt as keyboard_exception:
         sys.exit('\nERROR: Interrupted by user')
