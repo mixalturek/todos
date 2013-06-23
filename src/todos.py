@@ -246,6 +246,17 @@ class Todos:
 			self.logger.warn('Changing encoding to default: {0}'.format(ENCODING))
 			parameters.encoding = ENCODING
 
+		if parameters.extensions is not None:
+			tmp_extensions = []
+
+			for extension in parameters.extensions:
+				if extension.startswith('.'):
+					tmp_extensions.append(extension)
+				else:
+					tmp_extensions.append('.' + extension)
+
+			parameters.extensions = tmp_extensions
+
 
 ###############################################################################
 ####
@@ -390,10 +401,6 @@ class CommentsSearch:
 
 		self.summary = Summary(parameters)
 		""" The summary of the searching. """
-
-		if self.parameters.extensions is not None:
-			# TODO: append the dot only if it isn't already present
-			self.parameters.extensions = ['.' + e for e in self.parameters.extensions]
 
 		flags = 0
 		if self.parameters.ignore_case:
