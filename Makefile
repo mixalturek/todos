@@ -41,7 +41,7 @@ extra: tests pylint doc lines sloccount
 .PHONY: tests
 tests:
 	mkdir -p $(BUILD_DIR)
-	nosetests --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive
+	nosetests --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-html --cover-html-dir=build/coverage
 
 	# Debian contains too old python-coverage package
 	# python -m coverage xml --include=todos*
