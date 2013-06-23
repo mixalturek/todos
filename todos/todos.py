@@ -65,7 +65,7 @@ class Todos:
         """
 
         self.logger = Logger(False) # Will be redefined in main()
-        """ The logger used in the application. """
+        # """ The logger used in the application. """
 
 
     def main(self, argv):
@@ -278,7 +278,7 @@ class Logger:
         Class constructor.
         """
         self.verbose_enabled = verbose_enabled
-        """ Flag to enable the verbose mode. """
+        # """ Flag to enable the verbose mode. """
 
 
     def verbose(self, message):
@@ -317,16 +317,16 @@ class Comment:
         Class constructor, initialize all members.
         """
         self.str_pattern = str_pattern
-        """ The pattern that was searched and found. """
+        # """ The pattern that was searched and found. """
 
         self.file = file
-        """ The input file. """
+        # """ The input file. """
 
         self.position = position
-        """ The position in the file. """
+        # """ The position in the file. """
 
         self.lines = lines
-        """ The matching line and optionally several lines after it. """
+        # """ The matching line and optionally several lines after it. """
 
 
 ###############################################################################
@@ -343,10 +343,10 @@ class Pattern:
         Class constructor, initialize all members.
         """
         self.str_pattern = str_pattern
-        """ The string representation of the pattern. """
+        # """ The string representation of the pattern. """
 
         self.re_pattern = re_pattern
-        """ The precompiled pattern. """
+        # """ The precompiled pattern. """
 
 
     def __str__(self):
@@ -369,16 +369,16 @@ class Summary:
         Class constructor, initialize all members to zero or empty list.
         """
         self.total_files = 0
-        """ The number of the examined files. """
+        # """ The number of the examined files. """
 
         self.total_directories = 0
-        """ The number of the examined directories. """
+        # """ The number of the examined directories. """
 
         self.per_pattern = {}
-        """ Summary per pattern. """
+        # """ Summary per pattern. """
 
         self.per_file = {}
-        """ Summary per file. """
+        # """ Summary per file. """
 
         for str_pattern in parameters.patterns:
             self.per_pattern[str_pattern] = 0
@@ -397,16 +397,16 @@ class CommentsSearch:
         Class constructor, prepare the object for searching.
         """
         self.parameters = parameters
-        """ The input parameters. """
+        # """ The input parameters. """
 
         self.logger = logger
-        """ The logger to output messages. """
+        # """ The logger to output messages. """
 
         self.comments = []
-        """ The comments that was found during the searching. """
+        # """ The comments that was found during the searching. """
 
         self.summary = Summary(parameters)
-        """ The summary of the searching. """
+        # """ The summary of the searching. """
 
         flags = 0
         if self.parameters.ignore_case:
@@ -608,10 +608,10 @@ class OutputWriter:
         Class constructor.
         """
         self.parameters = parameters
-        """ The input parameters. """
+        # """ The input parameters. """
 
         self.logger = logger
-        """ The logger to output messages. """
+        # """ The logger to output messages. """
 
 
     def output(self, comments_search):
@@ -693,7 +693,7 @@ class TxtFormatter:
         Class constructor.
         """
         self.multiline = multiline
-        """ Multiple lines per pattern will be passed to the output. """
+        # """ Multiple lines per pattern will be passed to the output. """
 
 
     def get_type(self):
@@ -754,7 +754,7 @@ class XmlFormatter:
         Class constructor.
         """
         self.parameters = parameters
-        """ The input parameters. """
+        # """ The input parameters. """
 
 
     def get_type(self):
@@ -830,7 +830,7 @@ class HtmlFormatter:
         Class constructor.
         """
         self.parameters = parameters
-        """ The input parameters. """
+        # """ The input parameters. """
 
 
     def get_type(self):

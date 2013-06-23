@@ -18,3 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with todos.  If not, see <http://www.gnu.org/licenses/>.
 #
+
+"""
+Search TODO, FIXME and similar comments in project files.
+"""
