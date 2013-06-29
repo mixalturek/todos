@@ -109,7 +109,10 @@ tests:
 
 .PHONY: pylint
 pylint:
-	pylint -f parseable todos | tee build/pylint.out
+	@# W0511 - TODO/FIXME string in the code
+	@# R0201 - Method could be a function
+	@# R0903 - Too few public methods
+	pylint -f parseable -d W0511,R0201,R0903 todos | tee build/pylint.out
 
 
 ###############################################################################
