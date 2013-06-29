@@ -1,5 +1,6 @@
 Common
 	File headers, license.
+	Exit code 1 on error.
 
 Web
 	grep -rIn 'TODO' .
@@ -12,3 +13,5 @@ Jenkins
 	Interface similar to https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin
 	https://wiki.jenkins-ci.org/display/JENKINS/Plugin+tutorial
 	https://wiki.jenkins-ci.org/display/~martino/2011/10/27/The+JenkinsPluginTotallySimpelGuide
+	http://plugin-generator.jenkins-ci.org/
+	https://wiki.jenkins-ci.org/display/JENKINS/Hosting+Plugins

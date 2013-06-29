@@ -10,4 +10,7 @@
 ./todos.files
 ./todos.includes
 ./todos/__init__.py
+./todos/__main__.py
 ./todos/todos.py
+./utils/create_readme.py
+./utils/README.md.in

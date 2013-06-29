@@ -200,6 +200,7 @@ class Todos:
                 'directory',
                 nargs='*',
                 help='the input directory to search in',
+                metavar='DIRECTORY',
                 # ValueError: dest supplied twice for positional argument
                 # dest='directories',
                 default=DIRECTORIES

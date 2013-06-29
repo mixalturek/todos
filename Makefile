@@ -25,14 +25,71 @@ BUILD_DIR = build
 
 
 ###############################################################################
+#### Variables
+
+PROJECT = todos
+SOURCES = $(wildcard $(PROJECT)/*.py)
+
+PREFIX=/usr/local
+BINDIR=$(PREFIX)/bin
+MANDIR=$(PREFIX)/man
+PYTHON=/usr/bin/env python
+
+
+###############################################################################
 #### Default
 
 .PHONY: all
-all:
+all: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1
 
 
 .PHONY: extra
 extra: tests pylint doc lines sloccount
+
+
+###############################################################################
+#### Application
+
+$(BUILD_DIR)/$(PROJECT): $(SOURCES)
+	mkdir -p $(BUILD_DIR)
+	zip --quiet $(BUILD_DIR)/$(PROJECT) $(SOURCES)
+	zip --quiet --junk-paths $(BUILD_DIR)/$(PROJECT) $(PROJECT)/__main__.py
+	echo '#!$(PYTHON)' > $(BUILD_DIR)/$(PROJECT)
+	cat $(BUILD_DIR)/$(PROJECT).zip >> $(BUILD_DIR)/$(PROJECT)
+	rm $(BUILD_DIR)/$(PROJECT).zip
+	chmod a+x $(BUILD_DIR)/$(PROJECT)
+
+
+###############################################################################
+#### Documentation
+
+$(BUILD_DIR)/README.md: $(SOURCES) utils/README.md.in $(BUILD_DIR)/$(PROJECT)
+	COLUMNS=69 $(BUILD_DIR)/$(PROJECT) --help | python3 utils/create_readme.py
+
+
+$(BUILD_DIR)/README.txt: $(BUILD_DIR)/README.md
+	pandoc -f markdown -t plain $(BUILD_DIR)/README.md -o $(BUILD_DIR)/README.txt
+
+
+$(BUILD_DIR)/$(PROJECT).1: $(BUILD_DIR)/README.md
+	pandoc -s -f markdown -t man $(BUILD_DIR)/README.md -o $(BUILD_DIR)/$(PROJECT).1
+
+
+###############################################################################
+#### Install
+
+.PHONY: install
+install: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/$(PROJECT).1
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 755 $(BUILD_DIR)/$(PROJECT) $(DESTDIR)$(BINDIR)
+	install -d $(DESTDIR)$(MANDIR)/man1
+	install -m 644 $(BUILD_DIR)/$(PROJECT).1 $(DESTDIR)$(MANDIR)/man1
+
+
+.PHONY: install
+uninstall:
+	rm -f $(DESTDIR)$(BINDIR)/$(PROJECT)
+	rm -f $(DESTDIR)$(MANDIR)/man1/$(PROJECT).1
 
 
 ###############################################################################
@@ -41,14 +98,14 @@ extra: tests pylint doc lines sloccount
 .PHONY: tests
 tests:
 	mkdir -p $(BUILD_DIR)
-	nosetests --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-html --cover-html-dir=build/coverage
+	nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-html --cover-html-dir=build/coverage
 
 	# Debian contains too old python-coverage package
 	# python -m coverage xml --include=todos*
 
 
 ###############################################################################
-####
+#### Pylint
 
 .PHONY: pylint
 pylint:
