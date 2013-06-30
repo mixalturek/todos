@@ -98,9 +98,10 @@ tr:hover    { background-color: #C0C0FF; }
 
 #page       { margin-left: 17%; }
 /* backgroud-color: white; */
-#sidebar    { position: fixed; top: 0px; left: 0px; width: 15%; padding: 2em; }
+#sidebar    { position: fixed; top: 0px; left: 0px; width: 14%; padding: 2em;
+                background-color: white; }
 #footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver;
-              color: gray; clear: both; }
+                color: gray; clear: both; }
 
 #sidebar .menu_title { font-weight: bold; font-size: 14pt; }
 #sidebar ul { margin-left: 1em; padding-left: 0px; }
@@ -292,10 +293,12 @@ tr:hover    { background-color: #C0C0FF; }
         """
         Write the footer to the output stream.
         """
-        print >> out_stream, '<p id="footer">Page generated: {0}, {1}, {2}.'
-        '</p>'.format(strftime("%Y-%m-%d %H:%M:%S", localtime()),
+        print >> out_stream, '<p id="footer">'
+        print >> out_stream, 'Page generated: {0}, {1}, {2}'.format(
+                strftime("%Y-%m-%d %H:%M:%S", localtime()),
                 self.html_link('http://todos.sourceforge.net/', 'todos'),
                 todos.TODOS_VERSION)
+        print >> out_stream, '</p>'
         print >> out_stream, '</body>'
         print >> out_stream, '</html>'
 
