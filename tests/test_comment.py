@@ -24,13 +24,19 @@ Unit test of Comment class.
 """
 
 
-import unittest
-import todos.todos as todos
+###############################################################################
+####
 
+import unittest
+import todos.search
+
+
+###############################################################################
+####
 
 class CommentTestCase(unittest.TestCase):
     def test_constructor(self):
-        comment = todos.Comment('str_pattern', 'path', 42, ['line 1', 'line 2'])
+        comment = todos.search.Comment('str_pattern', 'path', 42, ['line 1', 'line 2'])
         self.assertEqual('str_pattern', comment.str_pattern)
         self.assertEqual('path', comment.path)
         self.assertEqual(42, comment.position)
