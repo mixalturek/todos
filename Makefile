@@ -52,6 +52,7 @@ extra: tests pylint doc lines sloccount
 
 $(BUILD_DIR)/$(PROJECT): $(SOURCES)
 	mkdir -p $(BUILD_DIR)
+	rm -f $(BUILD_DIR)/$(PROJECT)
 	zip --quiet $(BUILD_DIR)/$(PROJECT) $(SOURCES)
 	zip --quiet --junk-paths $(BUILD_DIR)/$(PROJECT) $(PROJECT)/__main__.py
 	echo '#!$(PYTHON)' > $(BUILD_DIR)/$(PROJECT)
