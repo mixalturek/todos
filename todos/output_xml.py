@@ -28,7 +28,7 @@ Output the data in XML format.
 ###############################################################################
 ####
 
-import todos
+import version
 
 
 ###############################################################################
@@ -64,7 +64,7 @@ class XmlFormatter:
 
         print >> out_stream, '<Todos>'
         print >> out_stream, '\t<Version todos="{0}" format="{1}">'.format(
-                todos.TODOS_VERSION, todos.XML_VERSION)
+                version.TodosVersion.VERSION, version.TodosVersion.XML_VERSION)
         print >> out_stream, '\t<Comments>'
 
 

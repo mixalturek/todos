@@ -35,13 +35,13 @@ import codecs
 import logger
 import search
 import output
+import version
 
 
 ###############################################################################
 #### Configuration, default values
 
-TODOS_VERSION = '0.1.0'
-XML_VERSION = '0.1.0'
+
 
 COMMENTS = ['#', '//', '/*']
 PATTERNS = [r'\bTODO\b', r'\bFIXME\b']
@@ -100,7 +100,7 @@ class Todos:
                 '-V', '--version',
                 help='show version and exit',
                 action='version',
-                version='%(prog)s ' + TODOS_VERSION
+                version='%(prog)s ' + version.TodosVersion.VERSION
         )
 
         parser.add_argument(

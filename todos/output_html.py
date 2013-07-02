@@ -34,7 +34,7 @@ import socket
 from operator import itemgetter
 from time import localtime, strftime
 
-import todos
+import version
 
 
 ###############################################################################
@@ -294,10 +294,10 @@ tr:hover    { background-color: #C0C0FF; }
         Write the footer to the output stream.
         """
         print >> out_stream, '<p id="footer">'
-        print >> out_stream, 'Page generated: {0}, {1}, {2}'.format(
+        print >> out_stream, 'Page generated: {0}, {1} {2}'.format(
                 strftime("%Y-%m-%d %H:%M:%S", localtime()),
                 self.html_link('http://todos.sourceforge.net/', 'todos'),
-                todos.TODOS_VERSION)
+                version.TodosVersion.VERSION)
         print >> out_stream, '</p>'
         print >> out_stream, '</body>'
         print >> out_stream, '</html>'
