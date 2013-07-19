@@ -62,8 +62,7 @@ class XmlFormatter:
         print >> out_stream, '<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(
                 self.parameters.encoding)
 
-        print >> out_stream, '<todos>'
-        print >> out_stream, '\t<version todos="{0}" format="{1}">'.format(
+        print >> out_stream, '<todos version="{0}" fileformat="{1}">'.format(
                 version.TodosVersion.VERSION, version.TodosVersion.XML_VERSION)
         print >> out_stream, '\t<comments>'
 
