@@ -59,13 +59,13 @@ class XmlFormatter:
         """
         Write the header to the output stream.
         """
-        print >> out_stream, '<?xml version="1.0" encoding="{0}" '
-        'standalone="yes"?>'.format(self.parameters.encoding)
+        print >> out_stream, '<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(
+                self.parameters.encoding)
 
-        print >> out_stream, '<Todos>'
-        print >> out_stream, '\t<Version todos="{0}" format="{1}">'.format(
+        print >> out_stream, '<todos>'
+        print >> out_stream, '\t<version todos="{0}" format="{1}">'.format(
                 version.TodosVersion.VERSION, version.TodosVersion.XML_VERSION)
-        print >> out_stream, '\t<Comments>'
+        print >> out_stream, '\t<comments>'
 
 
     def write_data(self, out_stream, comments, summary):
@@ -73,8 +73,7 @@ class XmlFormatter:
         Write the data to the output stream.
         """
         for comment in comments:
-            print >> out_stream, '\t\t<Comment pattern="{0}" file="{1}" '
-            'line="{2}">'.format(
+            print >> out_stream, '\t\t<comment pattern="{0}" file="{1}" line="{2}">'.format(
                     self.xml_special_chars(comment.str_pattern),
                     self.xml_special_chars(comment.path),
                     comment.position)
@@ -83,15 +82,15 @@ class XmlFormatter:
                 print >> out_stream, '\t\t\t{0}'.format(
                         self.xml_special_chars(line))
 
-            print >> out_stream, '\t\t</Comment>'
+            print >> out_stream, '\t\t</comment>'
 
 
     def write_footer(self, out_stream):
         """
         Write the footer to the output stream.
         """
-        print >> out_stream, '\t</Comments>'
-        print >> out_stream, '</Todos>'
+        print >> out_stream, '\t</comments>'
+        print >> out_stream, '</todos>'
 
 
     def xml_special_chars(self, text):
