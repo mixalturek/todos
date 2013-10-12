@@ -3,20 +3,20 @@
 #
 # Copyright 2013 Michal Turek
 #
-# This file is part of todos.
+# This file is part of TODOs.
 # http://todos.sourceforge.net/
 #
-# todos is free software: you can redistribute it and/or modify
+# TODOs is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
 #
-# todos is distributed in the hope that it will be useful,
+# TODOs is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with todos.  If not, see <http://www.gnu.org/licenses/>.
+# along with TODOs.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 
@@ -74,7 +74,7 @@ class HtmlFormatter:
 <head>
 <meta http-equiv="content-type" content="text/html; charset={0}" />
 <meta http-equiv="content-language" content="en" />
-<title>Comments Report - todos</title>
+<title>Comments Report - TODOs</title>
 '''.format(self.parameters.encoding)
 
         print >> out_stream, '''
@@ -296,7 +296,7 @@ tr:hover    { background-color: #C0C0FF; }
         print >> out_stream, '<p id="footer">'
         print >> out_stream, 'Page generated: {0}, {1} {2}'.format(
                 strftime("%Y-%m-%d %H:%M:%S", localtime()),
-                self.html_link('http://todos.sourceforge.net/', 'todos'),
+		self.html_link('http://todos.sourceforge.net/', 'TODOs'),
                 version.TodosVersion.VERSION)
         print >> out_stream, '</p>'
         print >> out_stream, '</body>'

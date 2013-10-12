@@ -7,7 +7,7 @@ todos - search TODO, FIXME and similar comments in project files
 **todos** [OPTIONS] DIRECTORY [DIRECTORY...]
 
 # DESCRIPTION
-**todos** is a small command-line program to search TODO, FIXME and similar
+**TODOs** is a small command-line program to search TODO, FIXME and similar
 comments in project files. It requires the Python interpreter and it is not
 platform specific.
 
@@ -17,7 +17,7 @@ platform specific.
 
 
 # SEE ALSO
-See the todos website at http://todos.sourceforge.net/.
+See the TODOs website at http://todos.sourceforge.net/.
 
 # AUTHOR
 Written by Michal Turek.
