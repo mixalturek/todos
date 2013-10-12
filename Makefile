@@ -99,9 +99,7 @@ uninstall:
 .PHONY: tests
 tests:
 	mkdir -p $(BUILD_DIR)
-
-	# TODO: broken by python3, uncomment and solve
-	#nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
+	nosetests3 --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
 
 
 ###############################################################################
@@ -113,8 +111,7 @@ pylint:
 	@# W0511 - TODO/FIXME string in the code
 	@# R0201 - Method could be a function
 	@# R0903 - Too few public methods
-	# TODO: broken by python3, uncomment and solve
-	#pylint -f parseable -d W0511,R0201,R0903 todos | tee build/pylint.out
+	pylint -f parseable -d W0511,R0201,R0903 todos | tee build/pylint.out
 
 
 ###############################################################################
