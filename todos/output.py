@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2013 Michal Turek
@@ -31,9 +31,10 @@ Output the data.
 import sys
 import os.path
 import codecs
-import output_txt
-import output_xml
-import output_html
+
+from . import output_txt
+from . import output_xml
+from . import output_html
 
 
 ###############################################################################

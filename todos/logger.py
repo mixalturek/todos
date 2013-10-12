@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2013 Michal Turek
@@ -54,18 +54,18 @@ class Logger:
         is enabled.
         """
         if self.verbose_enabled:
-            print message
+            print(message)
 
 
     def warn(self, message):
         """
         Output a warning message to the standard error stream.
         """
-        print >> sys.stderr, 'WARN:', message
+        print('WARN: {0}'.format(message), file=sys.stderr)
 
 
     def error(self, message):
         """
         Output an error message to the standard error stream.
         """
-        print >> sys.stderr, 'ERROR:', message
+        print('ERROR: {0}'.format(message), file=sys.stderr)

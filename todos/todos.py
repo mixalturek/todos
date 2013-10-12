@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2013 Michal Turek
@@ -32,10 +32,10 @@ import argparse
 import sys
 import codecs
 
-import logger
-import search
-import output
-import version
+from . import logger
+from . import search
+from . import output
+from . import version
 
 
 ###############################################################################

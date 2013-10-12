@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2013 Michal Turek
@@ -34,7 +34,7 @@ import socket
 from operator import itemgetter
 from time import localtime, strftime
 
-import version
+from . import version
 
 
 ###############################################################################
@@ -65,7 +65,7 @@ class HtmlFormatter:
         """
         Write the header to the output stream.
         """
-        print >> out_stream, '''<?xml version="1.0" encoding="{0}"?>
+        print('''<?xml version="1.0" encoding="{0}"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
         "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
@@ -75,9 +75,9 @@ class HtmlFormatter:
 <meta http-equiv="content-type" content="text/html; charset={0}" />
 <meta http-equiv="content-language" content="en" />
 <title>Comments Report - TODOs</title>
-'''.format(self.parameters.encoding)
+'''.format(self.parameters.encoding), file=out_stream)
 
-        print >> out_stream, '''
+        print('''
 <style type="text/css" media="all">
 body
 {
@@ -116,49 +116,54 @@ tr:hover    { background-color: #C0C0FF; }
 </head>
 
 <body>
-'''
+''', file=out_stream)
 
 
     def write_data(self, out_stream, comments, summary):
         """
         Write the data to the output stream.
         """
-        print >> out_stream, '<div id="sidebar">'
+        print('<div id="sidebar">', file=out_stream)
 
         self.write_toc(out_stream)
 
-        print >> out_stream, '</div><!-- id="sidebar" -->'
+        print('</div><!-- id="sidebar" -->', file=out_stream)
 
 
-        print >> out_stream, '<div id="page">'
+        print('<div id="page">', file=out_stream)
 
-        print >> out_stream, '<h1 id="commentsReport">Comments Report</h1>'
+        print('<h1 id="commentsReport">Comments Report</h1>', file=out_stream)
 
-        print >> out_stream, '<h2 id="inputParameters">Input Parameters</h2>\n'
+        print('<h2 id="inputParameters">Input Parameters</h2>\n', file=out_stream)
+
         self.write_input_parameters(out_stream)
 
-        print >> out_stream, '<h2 id="summary">Summary</h2>\n'
+        print('<h2 id="summary">Summary</h2>\n', file=out_stream)
 
-        print >> out_stream, '<h3 id="general">General</h3>\n'
+        print('<h3 id="general">General</h3>\n', file=out_stream)
+
         self.write_general_summary(out_stream, summary)
 
-        print >> out_stream, '<h3 id="per_patterns">Per Patterns</h3>\n'
+        print('<h3 id="per_patterns">Per Patterns</h3>\n', file=out_stream)
+
         self.write_per_pattern(out_stream, summary.per_pattern)
 
-        print >> out_stream, '<h3 id="per_files">Per Files</h3>\n'
+        print('<h3 id="per_files">Per Files</h3>\n', file=out_stream)
+
         self.write_per_file(out_stream, summary.per_file)
 
-        print >> out_stream, '<h2 id="details">Details</h2>\n'
+        print('<h2 id="details">Details</h2>\n', file=out_stream)
+
         self.write_comments(out_stream, comments)
 
-        print >> out_stream, '</div><!-- id="page" -->'
+        print('</div><!-- id="page" -->', file=out_stream)
 
 
     def write_toc(self, out_stream):
         """
         Write table of contents as menu.
         """
-        print >> out_stream, '''
+        print('''
 <div class="menu_title">Menu</div>
 
 <ul>
@@ -176,7 +181,7 @@ tr:hover    { background-color: #C0C0FF; }
     </ul>
 </li>
 </ul>
-'''
+''', file=out_stream)
 
 
     def write_input_parameters(self, out_stream):
@@ -190,11 +195,11 @@ tr:hover    { background-color: #C0C0FF; }
         ]
         self.html_table(out_stream, ['Parameter', 'Value'], rows)
 
-        print >> out_stream, '<pre>'
-        print >> out_stream, 'cd {0}'.format(
-                self.html_special_chars(os.getcwd()))
-        print >> out_stream, self.html_special_chars(' '.join(sys.argv))
-        print >> out_stream, '</pre>\n'
+        print('<pre>', file=out_stream)
+        print('cd {0}'.format(
+                self.html_special_chars(os.getcwd())), file=out_stream)
+        print(self.html_special_chars(' '.join(sys.argv)), file=out_stream)
+        print('</pre>\n', file=out_stream)
 
         rows = [['Working Directory', self.html_special_chars(
                         os.getcwd())],
@@ -233,7 +238,7 @@ tr:hover    { background-color: #C0C0FF; }
         Write summary as a table.
         """
         num_files_with_matches = 0
-        for path, count in summary.per_file.iteritems():
+        for count in summary.per_file.values():
             if count != 0:
                 num_files_with_matches += 1
 
@@ -250,8 +255,8 @@ tr:hover    { background-color: #C0C0FF; }
         Write table of the input patterns together with the number of their
         occurrences.
         """
-        rows = [[self.html_special_chars(str_pattern), comment]
-                for str_pattern, comment in per_pattern.iteritems()]
+        rows = [[self.html_special_chars(item[0]), item[1]]
+                for item in per_pattern.items()]
         rows.sort(key=itemgetter(1), reverse=True)
         self.html_table(out_stream, ['Pattern', 'Occurrences'], rows)
 
@@ -263,7 +268,9 @@ tr:hover    { background-color: #C0C0FF; }
         """
         rows = []
 
-        for path, count in per_file.iteritems():
+        for item in per_file.items():
+            path = item[0]
+            count = item[1]
             if count > 0:
                 rows.append([self.html_link(os.path.abspath(path), path),
                         count])
@@ -293,14 +300,14 @@ tr:hover    { background-color: #C0C0FF; }
         """
         Write the footer to the output stream.
         """
-        print >> out_stream, '<p id="footer">'
-        print >> out_stream, 'Page generated: {0}, {1} {2}'.format(
+        print('<p id="footer">', file=out_stream)
+        print('Page generated: {0}, {1} {2}'.format(
                 strftime("%Y-%m-%d %H:%M:%S", localtime()),
-		self.html_link('http://todos.sourceforge.net/', 'TODOs'),
-                version.TodosVersion.VERSION)
-        print >> out_stream, '</p>'
-        print >> out_stream, '</body>'
-        print >> out_stream, '</html>'
+                self.html_link('http://todos.sourceforge.net/', 'TODOs'),
+                version.TodosVersion.VERSION), file=out_stream)
+        print('</p>', file=out_stream)
+        print('</body>', file=out_stream)
+        print('</html>', file=out_stream)
 
 
     def html_special_chars(self, text):
@@ -330,20 +337,20 @@ tr:hover    { background-color: #C0C0FF; }
         """
         Write a HTML table to the output stream.
         """
-        print >> out_stream, '<table>\n<thead>\n<tr>'
+        print('<table>\n<thead>\n<tr>', file=out_stream)
 
         for header in headers:
-            print >> out_stream, '<th>{0}</th>'.format(header)
+            print('<th>{0}</th>'.format(header), file=out_stream)
 
-        print >> out_stream, '</tr>\n</thead>\n\n<tbody>\n'
+        print('</tr>\n</thead>\n\n<tbody>\n', file=out_stream)
 
         for row in rows:
-            print >> out_stream, '<tr>'
+            print('<tr>', file=out_stream)
 
             for item in row:
-                print >> out_stream, '<td>{0}</td>'.format(item)
+                print('<td>{0}</td>'.format(item), file=out_stream)
 
-            print >> out_stream, '</tr>\n'
+            print('</tr>\n', file=out_stream)
 
 
-        print >> out_stream, '</tbody>\n</table>\n'
+        print('</tbody>\n</table>\n', file=out_stream)

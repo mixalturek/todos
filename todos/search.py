@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2013 Michal Turek
@@ -242,7 +242,8 @@ class CommentsSearch:
         #
         # Note UTF-16 encoded text files will be clasified as binary,
         # is it correct/incorrect?
-        return '\0' in chunk
+        # 0 means '\0' here
+        return 0 in chunk
 
 
     def process_file(self, path):

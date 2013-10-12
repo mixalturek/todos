@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Copyright 2013 Michal Turek
@@ -65,18 +65,18 @@ class TxtFormatter:
         Write the data to the output stream.
         """
         if self.multiline:
-            print >> out_stream, self.MULTILINE_DELIMITER
+            print(self.MULTILINE_DELIMITER, file=out_stream)
 
         for comment in comments:
             position = comment.position
 
             for line in comment.lines:
-                print >> out_stream, '{0}:{1}: {2}'.format(
-                        comment.path, position, line)
+                print('{0}:{1}: {2}'.format(
+                        comment.path, position, line), file=out_stream)
                 position += 1
 
             if self.multiline:
-                print >> out_stream, self.MULTILINE_DELIMITER
+                print(self.MULTILINE_DELIMITER, file=out_stream)
 
 
     def write_footer(self, out_stream):

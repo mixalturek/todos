@@ -1,7 +1,7 @@
 % todos(1)
 
 # NAME
-todos - search TODO, FIXME and similar comments in project files
+TODOs - search TODO, FIXME and similar comments in project files
 
 # SYNOPSIS
 **todos** [OPTIONS] DIRECTORY [DIRECTORY...]
