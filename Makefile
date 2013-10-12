@@ -40,7 +40,7 @@ PYTHON=/usr/bin/env python3
 #### Default
 
 .PHONY: all
-all: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1
+all: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1 README.txt
 
 
 .PHONY: extra
@@ -74,6 +74,9 @@ $(BUILD_DIR)/README.txt: $(BUILD_DIR)/README.md
 
 $(BUILD_DIR)/$(PROJECT).1: $(BUILD_DIR)/README.md
 	pandoc -s -f markdown -t man $(BUILD_DIR)/README.md -o $(BUILD_DIR)/$(PROJECT).1
+
+README.txt: $(BUILD_DIR)/README.txt
+	cp $(BUILD_DIR)/README.txt README.txt
 
 
 ###############################################################################
