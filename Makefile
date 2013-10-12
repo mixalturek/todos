@@ -99,10 +99,7 @@ uninstall:
 .PHONY: tests
 tests:
 	mkdir -p $(BUILD_DIR)
-	nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-html --cover-html-dir=build/coverage
-
-	# Debian contains too old python-coverage package
-	# python -m coverage xml --include=todos*
+	nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
 
 
 ###############################################################################
@@ -110,6 +107,7 @@ tests:
 
 .PHONY: pylint
 pylint:
+	mkdir -p $(BUILD_DIR)
 	@# W0511 - TODO/FIXME string in the code
 	@# R0201 - Method could be a function
 	@# R0903 - Too few public methods
