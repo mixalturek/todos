@@ -21,17 +21,18 @@
 
 
 """
-Version informations.
+Abstract class for putting data to the output stream.
 """
 
 
 ###############################################################################
 ####
 
-class TodosVersion(object):
+class AbstractFormatter(object):
     """
-    Version informations.
+    Abstract formatter.
     """
+
 
     def __init__(self):
         """
@@ -40,29 +41,9 @@ class TodosVersion(object):
         pass
 
 
-    VERSION_MAJOR = 0
-    # """ Major version of the application. """
-
-    VERSION_MINOR = 1
-    # """ Minor version of the application. """
-
-    VERSION_REVISION = 0
-    # """ Revision of the application. """
-
-    VERSION = '{0}.{1}.{2}'.format(VERSION_MAJOR, VERSION_MINOR,
-            VERSION_REVISION)
-    # """ Concatenated version parts of the application. """
-
-
-    XML_VERSION_MAJOR = 0
-    # """ Major version of the XML output format. """
-
-    XML_VERSION_MINOR = 1
-    # """ Minor version of the XML output format. """
-
-    XML_VERSION_REVISION = 0
-    # """ Revision of the XML output format. """
-
-    XML_VERSION = '{0}.{1}.{2}'.format(XML_VERSION_MAJOR, XML_VERSION_MINOR,
-            XML_VERSION_REVISION)
-    # """ Concatenated version parts of the XML output format. """
+    def writeln(self, data, out_stream):
+        """
+        Write data to the output stream and append a new line.
+        """
+        out_stream.write(data)
+        out_stream.write('\n')

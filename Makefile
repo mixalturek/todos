@@ -99,7 +99,8 @@ uninstall:
 .PHONY: tests
 tests:
 	mkdir -p $(BUILD_DIR)
-	nosetests3 --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
+	# TODO: Use nosetests3 tool after it is available in Debian
+	nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
 
 
 ###############################################################################
@@ -156,4 +157,5 @@ qtcreator:
 clean:
 	rm -rf $(BUILD_DIR)
 	find . -name '*.pyc' -exec rm {} \;
+	find . -name '__pycache__' -exec rm -rf {} \;
 	find . -name '.coverage' -exec rm {} \;

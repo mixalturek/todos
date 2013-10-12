@@ -1,5 +1,8 @@
 ./COPYING
 ./Doxyfile
+./logo/todos-16.png
+./logo/todos-32.png
+./logo/todos-64.png
 ./Makefile
 ./tests/__init__.py
 ./tests/test_comment.py
@@ -12,6 +15,7 @@
 ./todos/__init__.py
 ./todos/logger.py
 ./todos/__main__.py
+./todos/output_abstract.py
 ./todos/output_html.py
 ./todos/output.py
 ./todos/output_txt.py

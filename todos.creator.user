@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 2.8.1, 2013-10-12T11:51:44. -->
+<!-- Written by QtCreator 2.8.1, 2013-10-13T00:37:24. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -199,12 +199,12 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">build/todos -f -e '\bTODO\b' '\bFIXME\b' '\bOPEN\b' '@[a-zA-Z]{2,3}@' -A 5 -o build/todos.txt -x build/todos.xml -m build/todos.html ~/down/s/</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">build/todos -f -e '\bTODO\b' '\bFIXME\b' '\bOPEN\b' '@[a-zA-Z]{2,3}@' -A 5 -o build/todos.txt -x build/todos.xml -m build/todos.html ~/tmp/s/</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">python3</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory">%{buildDir}</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run python3</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run python32</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>

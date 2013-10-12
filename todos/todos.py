@@ -54,7 +54,7 @@ ENCODING = 'utf-8'
 ###############################################################################
 ####
 
-class Todos:
+class Todos(object):
     """
     Top level module class that contains enter to the application. It drives
     parsing of the input files, searching comments and output of the results.

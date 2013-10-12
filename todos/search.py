@@ -36,7 +36,7 @@ import codecs
 ###############################################################################
 ####
 
-class Comment:
+class Comment(object):
     """
     Container to store one comment that was found.
     """
@@ -61,7 +61,7 @@ class Comment:
 ###############################################################################
 ####
 
-class Pattern:
+class Pattern(object):
     """
     Container to store one pattern (regular expression) for searching.
     """
@@ -88,7 +88,7 @@ class Pattern:
 ###############################################################################
 ####
 
-class Summary:
+class Summary(object):
     """
     Container to store a summary of the comments searching.
     """
@@ -116,7 +116,7 @@ class Summary:
 ###############################################################################
 ####
 
-class CommentsSearch:
+class CommentsSearch(object):
     """
     Search comments in the source files.
     """

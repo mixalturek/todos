@@ -29,6 +29,7 @@ Output the data in XML format.
 ####
 
 from . import version
+from . import output_abstract
 
 
 ###############################################################################
@@ -37,7 +38,7 @@ from . import version
 # TODO: Use a XML library for the output
 # TODO: Define a XSD schema
 
-class XmlFormatter:
+class XmlFormatter(output_abstract.AbstractFormatter):
     """
     XML formatter.
     """
@@ -47,6 +48,8 @@ class XmlFormatter:
         """
         Class constructor.
         """
+        super(XmlFormatter, self).__init__()
+
         self.parameters = parameters
         # """ The input parameters. """
 
@@ -62,12 +65,13 @@ class XmlFormatter:
         """
         Write the header to the output stream.
         """
-        print('<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(
-                self.parameters.encoding), file=out_stream)
+        self.writeln('<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(
+                self.parameters.encoding), out_stream)
 
-        print('<todos version="{0}" fileformat="{1}">'.format(
-                version.TodosVersion.VERSION, version.TodosVersion.XML_VERSION), file=out_stream)
-        print('\t<comments>', file=out_stream)
+        self.writeln('<todos version="{0}" fileformat="{1}">'.format(
+                version.TodosVersion.VERSION, version.TodosVersion.XML_VERSION),
+                out_stream)
+        self.writeln('\t<comments>', out_stream)
 
 
     def write_data(self, out_stream, comments, summary):
@@ -75,24 +79,24 @@ class XmlFormatter:
         Write the data to the output stream.
         """
         for comment in comments:
-            print('\t\t<comment pattern="{0}" file="{1}" line="{2}">'.format(
+            self.writeln('\t\t<comment pattern="{0}" "{1}" line="{2}">'.format(
                     self.xml_special_chars(comment.str_pattern),
                     self.xml_special_chars(comment.path),
-                    comment.position), file=out_stream)
+                    comment.position), out_stream)
 
             for line in comment.lines:
-                print('\t\t\t{0}'.format(
-                        self.xml_special_chars(line)), file=out_stream)
+                self.writeln('\t\t\t{0}'.format(
+                        self.xml_special_chars(line)), out_stream)
 
-            print('\t\t</comment>', file=out_stream)
+            self.writeln('\t\t</comment>', out_stream)
 
 
     def write_footer(self, out_stream):
         """
         Write the footer to the output stream.
         """
-        print('\t</comments>', file=out_stream)
-        print('</todos>', file=out_stream)
+        self.writeln('\t</comments>', out_stream)
+        self.writeln('</todos>', out_stream)
 
 
     def xml_special_chars(self, text):

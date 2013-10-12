@@ -28,7 +28,13 @@ Output the data in TXT format.
 ###############################################################################
 ####
 
-class TxtFormatter:
+from . import output_abstract
+
+
+###############################################################################
+####
+
+class TxtFormatter(output_abstract.AbstractFormatter):
     """
     Text formatter.
     """
@@ -41,6 +47,8 @@ class TxtFormatter:
         """
         Class constructor.
         """
+        super(TxtFormatter, self).__init__()
+
         self.multiline = multiline
         # """ Multiple lines per pattern will be passed to the output. """
 
@@ -65,18 +73,18 @@ class TxtFormatter:
         Write the data to the output stream.
         """
         if self.multiline:
-            print(self.MULTILINE_DELIMITER, file=out_stream)
+            self.writeln(self.MULTILINE_DELIMITER, out_stream)
 
         for comment in comments:
             position = comment.position
 
             for line in comment.lines:
-                print('{0}:{1}: {2}'.format(
-                        comment.path, position, line), file=out_stream)
+                self.writeln('{0}:{1}: {2}'.format(
+                        comment.path, position, line), out_stream)
                 position += 1
 
             if self.multiline:
-                print(self.MULTILINE_DELIMITER, file=out_stream)
+                self.writeln(self.MULTILINE_DELIMITER, out_stream)
 
 
     def write_footer(self, out_stream):

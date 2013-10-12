@@ -40,7 +40,7 @@ from . import output_html
 ###############################################################################
 ####
 
-class OutputWriter:
+class OutputWriter(object):
     """
     Write the results of the searching to the output files in specified formats.
     """

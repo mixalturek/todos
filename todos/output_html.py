@@ -35,12 +35,13 @@ from operator import itemgetter
 from time import localtime, strftime
 
 from . import version
+from . import output_abstract
 
 
 ###############################################################################
 ####
 
-class HtmlFormatter:
+class HtmlFormatter(output_abstract.AbstractFormatter):
     """
     HTML formatter.
     """
@@ -50,6 +51,8 @@ class HtmlFormatter:
         """
         Class constructor.
         """
+        super(HtmlFormatter, self).__init__()
+
         self.parameters = parameters
         # """ The input parameters. """
 
@@ -65,7 +68,7 @@ class HtmlFormatter:
         """
         Write the header to the output stream.
         """
-        print('''<?xml version="1.0" encoding="{0}"?>
+        self.writeln('''<?xml version="1.0" encoding="{0}"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
         "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
@@ -75,9 +78,9 @@ class HtmlFormatter:
 <meta http-equiv="content-type" content="text/html; charset={0}" />
 <meta http-equiv="content-language" content="en" />
 <title>Comments Report - TODOs</title>
-'''.format(self.parameters.encoding), file=out_stream)
+'''.format(self.parameters.encoding), out_stream)
 
-        print('''
+        self.writeln('''
 <style type="text/css" media="all">
 body
 {
@@ -116,54 +119,55 @@ tr:hover    { background-color: #C0C0FF; }
 </head>
 
 <body>
-''', file=out_stream)
+''', out_stream)
 
 
     def write_data(self, out_stream, comments, summary):
         """
         Write the data to the output stream.
         """
-        print('<div id="sidebar">', file=out_stream)
+        self.writeln('<div id="sidebar">', out_stream)
 
         self.write_toc(out_stream)
 
-        print('</div><!-- id="sidebar" -->', file=out_stream)
+        self.writeln('</div><!-- id="sidebar" -->', out_stream)
 
 
-        print('<div id="page">', file=out_stream)
+        self.writeln('<div id="page">', out_stream)
 
-        print('<h1 id="commentsReport">Comments Report</h1>', file=out_stream)
+        self.writeln('<h1 id="commentsReport">Comments Report</h1>', out_stream)
 
-        print('<h2 id="inputParameters">Input Parameters</h2>\n', file=out_stream)
+        self.writeln('<h2 id="inputParameters">Input Parameters</h2>\n',
+                out_stream)
 
         self.write_input_parameters(out_stream)
 
-        print('<h2 id="summary">Summary</h2>\n', file=out_stream)
+        self.writeln('<h2 id="summary">Summary</h2>\n', out_stream)
 
-        print('<h3 id="general">General</h3>\n', file=out_stream)
+        self.writeln('<h3 id="general">General</h3>\n', out_stream)
 
         self.write_general_summary(out_stream, summary)
 
-        print('<h3 id="per_patterns">Per Patterns</h3>\n', file=out_stream)
+        self.writeln('<h3 id="per_patterns">Per Patterns</h3>\n', out_stream)
 
         self.write_per_pattern(out_stream, summary.per_pattern)
 
-        print('<h3 id="per_files">Per Files</h3>\n', file=out_stream)
+        self.writeln('<h3 id="per_files">Per Files</h3>\n', out_stream)
 
         self.write_per_file(out_stream, summary.per_file)
 
-        print('<h2 id="details">Details</h2>\n', file=out_stream)
+        self.writeln('<h2 id="details">Details</h2>\n', out_stream)
 
         self.write_comments(out_stream, comments)
 
-        print('</div><!-- id="page" -->', file=out_stream)
+        self.writeln('</div><!-- id="page" -->', out_stream)
 
 
     def write_toc(self, out_stream):
         """
         Write table of contents as menu.
         """
-        print('''
+        self.writeln('''
 <div class="menu_title">Menu</div>
 
 <ul>
@@ -181,7 +185,7 @@ tr:hover    { background-color: #C0C0FF; }
     </ul>
 </li>
 </ul>
-''', file=out_stream)
+''', out_stream)
 
 
     def write_input_parameters(self, out_stream):
@@ -195,11 +199,11 @@ tr:hover    { background-color: #C0C0FF; }
         ]
         self.html_table(out_stream, ['Parameter', 'Value'], rows)
 
-        print('<pre>', file=out_stream)
-        print('cd {0}'.format(
-                self.html_special_chars(os.getcwd())), file=out_stream)
-        print(self.html_special_chars(' '.join(sys.argv)), file=out_stream)
-        print('</pre>\n', file=out_stream)
+        self.writeln('<pre>', out_stream)
+        self.writeln('cd {0}'.format(
+                self.html_special_chars(os.getcwd())), out_stream)
+        self.writeln(self.html_special_chars(' '.join(sys.argv)), out_stream)
+        self.writeln('</pre>\n', out_stream)
 
         rows = [['Working Directory', self.html_special_chars(
                         os.getcwd())],
@@ -300,14 +304,14 @@ tr:hover    { background-color: #C0C0FF; }
         """
         Write the footer to the output stream.
         """
-        print('<p id="footer">', file=out_stream)
-        print('Page generated: {0}, {1} {2}'.format(
+        self.writeln('<p id="footer">', out_stream)
+        self.writeln('Page generated: {0}, {1} {2}'.format(
                 strftime("%Y-%m-%d %H:%M:%S", localtime()),
                 self.html_link('http://todos.sourceforge.net/', 'TODOs'),
-                version.TodosVersion.VERSION), file=out_stream)
-        print('</p>', file=out_stream)
-        print('</body>', file=out_stream)
-        print('</html>', file=out_stream)
+                version.TodosVersion.VERSION), out_stream)
+        self.writeln('</p>', out_stream)
+        self.writeln('</body>', out_stream)
+        self.writeln('</html>', out_stream)
 
 
     def html_special_chars(self, text):
@@ -337,20 +341,20 @@ tr:hover    { background-color: #C0C0FF; }
         """
         Write a HTML table to the output stream.
         """
-        print('<table>\n<thead>\n<tr>', file=out_stream)
+        self.writeln('<table>\n<thead>\n<tr>', out_stream)
 
         for header in headers:
-            print('<th>{0}</th>'.format(header), file=out_stream)
+            self.writeln('<th>{0}</th>'.format(header), out_stream)
 
-        print('</tr>\n</thead>\n\n<tbody>\n', file=out_stream)
+        self.writeln('</tr>\n</thead>\n\n<tbody>\n', out_stream)
 
         for row in rows:
-            print('<tr>', file=out_stream)
+            self.writeln('<tr>', out_stream)
 
             for item in row:
-                print('<td>{0}</td>'.format(item), file=out_stream)
+                self.writeln('<td>{0}</td>'.format(item), out_stream)
 
-            print('</tr>\n', file=out_stream)
+            self.writeln('</tr>\n', out_stream)
 
 
-        print('</tbody>\n</table>\n', file=out_stream)
+        self.writeln('</tbody>\n</table>\n', out_stream)
