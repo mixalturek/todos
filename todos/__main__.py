@@ -20,28 +20,17 @@
 #
 
 
-# Execute with
-# $ python todos/__main__.py (2.6+)
-# $ python -m todos          (2.7+)
-
 """
 Search TODO, FIXME and similar comments in project files.
 """
 
 import sys
-import todos.todos
-
-
-if __package__ is None and not hasattr(sys, "frozen"):
-    # direct call of __main__.py
-    import os.path
-    PATH = os.path.realpath(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(os.path.dirname(PATH)))
+from . import todos
 
 
 if __name__ == '__main__':
     try:
-        TODOS = todos.todos.Todos()
+        TODOS = todos.Todos()
         TODOS.main(sys.argv[1:])
     except KeyboardInterrupt as keyboard_exception:
         sys.exit('\nERROR: Interrupted by user')

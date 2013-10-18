@@ -100,7 +100,6 @@ tr          { background-color: #D0D0EE; }
 tr:hover    { background-color: #C0C0FF; }
 
 #page       { margin-left: 17%; }
-/* backgroud-color: white; */
 #sidebar    { position: fixed; top: 0px; left: 0px; width: 14%; padding: 2em;
                 background-color: white; }
 #footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver;

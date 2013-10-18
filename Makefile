@@ -40,7 +40,7 @@ PYTHON=/usr/bin/env python3
 #### Default
 
 .PHONY: all
-all: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1 README.txt
+all: $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1 README.txt
 
 
 .PHONY: extra
@@ -48,24 +48,11 @@ extra: tests pylint doc lines sloccount
 
 
 ###############################################################################
-#### Application
-
-$(BUILD_DIR)/$(PROJECT): $(SOURCES)
-	mkdir -p $(BUILD_DIR)
-	rm -f $(BUILD_DIR)/$(PROJECT)
-	zip --quiet $(BUILD_DIR)/$(PROJECT) $(SOURCES)
-	zip --quiet --junk-paths $(BUILD_DIR)/$(PROJECT) $(PROJECT)/__main__.py
-	echo '#!$(PYTHON)' > $(BUILD_DIR)/$(PROJECT)
-	cat $(BUILD_DIR)/$(PROJECT).zip >> $(BUILD_DIR)/$(PROJECT)
-	rm $(BUILD_DIR)/$(PROJECT).zip
-	chmod a+x $(BUILD_DIR)/$(PROJECT)
-
-
-###############################################################################
 #### Documentation
 
-$(BUILD_DIR)/README.md: $(SOURCES) utils/README.md.in $(BUILD_DIR)/$(PROJECT)
-	COLUMNS=69 $(PYTHON) $(BUILD_DIR)/$(PROJECT) --help | $(PYTHON) utils/create_readme.py
+$(BUILD_DIR)/README.md: $(SOURCES) utils/README.md.in
+	mkdir -p $(BUILD_DIR)
+	COLUMNS=69 $(PYTHON) -m $(PROJECT) --help | $(PYTHON) utils/create_readme.py
 
 
 $(BUILD_DIR)/README.txt: $(BUILD_DIR)/README.md
@@ -83,14 +70,14 @@ README.txt: $(BUILD_DIR)/README.txt
 #### Install
 
 .PHONY: install
-install: $(BUILD_DIR)/$(PROJECT) $(BUILD_DIR)/$(PROJECT).1
-	install -d $(DESTDIR)$(BINDIR)
-	install -m 755 $(BUILD_DIR)/$(PROJECT) $(DESTDIR)$(BINDIR)
+install: $(BUILD_DIR)/$(PROJECT).1
+	#install -d $(DESTDIR)$(BINDIR)
+	#install -m 755 $(BUILD_DIR)/$(PROJECT) $(DESTDIR)$(BINDIR)
 	install -d $(DESTDIR)$(MANDIR)/man1
 	install -m 644 $(BUILD_DIR)/$(PROJECT).1 $(DESTDIR)$(MANDIR)/man1
 
 
-.PHONY: install
+.PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/$(PROJECT)
 	rm -f $(DESTDIR)$(MANDIR)/man1/$(PROJECT).1
@@ -102,8 +89,8 @@ uninstall:
 .PHONY: tests
 tests:
 	mkdir -p $(BUILD_DIR)
-	# TODO: Use nosetests3 tool after it is available in Debian
-	nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=todos --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
+	# TODO: Use nosetests3 tool after it is available in Debian with coverage
+	nosetests --verbose --with-xunit --xunit-file=build/nosetests.xml --all-modules --traverse-namespace --with-coverage --cover-package=$(PROJECT) --cover-inclusive --cover-erase --cover-branches --cover-html --cover-html-dir=build/coverage --cover-xml --cover-xml-file=build/coverage.xml
 
 
 ###############################################################################
@@ -115,7 +102,7 @@ pylint:
 	@# W0511 - TODO/FIXME string in the code
 	@# R0201 - Method could be a function
 	@# R0903 - Too few public methods
-	pylint -f parseable -d W0511,R0201,R0903 todos | tee build/pylint.out
+	pylint -f parseable -d W0511,R0201,R0903 $(PROJECT) | tee build/pylint.out
 
 
 ###############################################################################
@@ -129,7 +116,7 @@ lines:
 .PHONY: sloccount
 sloccount:
 	mkdir -p $(BUILD_DIR)
-	sloccount --duplicates --wide --details todos tests > $(BUILD_DIR)/sloccount.sc
+	sloccount --duplicates --wide --details $(PROJECT) tests > $(BUILD_DIR)/sloccount.sc
 
 
 ###############################################################################
@@ -150,7 +137,7 @@ qtcreator:
 		| grep -v '^\./build' \
 		| grep -v '^\./\.' \
 		| grep -v '\.pyc$$' \
-		| sort > todos.files
+		| sort > $(PROJECT).files
 
 
 ###############################################################################
