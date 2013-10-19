@@ -22,6 +22,7 @@
 #### Options, configuration
 
 BUILD_DIR = build
+DIST_DIR = dist
 
 
 ###############################################################################
@@ -40,7 +41,7 @@ PYTHON=/usr/bin/env python3
 #### Default
 
 .PHONY: all
-all: $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1 README
+all: $(BUILD_DIR)/README.md $(BUILD_DIR)/README.txt $(BUILD_DIR)/$(PROJECT).1 README dist
 
 
 .PHONY: extra
@@ -67,18 +68,28 @@ README: $(BUILD_DIR)/README.txt
 
 
 ###############################################################################
+#### Distribution packages
+
+.PHONY: dist
+dist:
+	$(PYTHON) setup.py sdist
+	# $(PYTHON) setup.py bdist_wininst
+	# $(PYTHON) setup.py bdist_rpm
+
+
+###############################################################################
 #### Install
 
 .PHONY: install
 install: $(BUILD_DIR)/$(PROJECT).1
-	#install -d $(DESTDIR)$(BINDIR)
-	#install -m 755 $(BUILD_DIR)/$(PROJECT) $(DESTDIR)$(BINDIR)
+	# $(PYTHON) setup.py install
 	install -d $(DESTDIR)$(MANDIR)/man1
 	install -m 644 $(BUILD_DIR)/$(PROJECT).1 $(DESTDIR)$(MANDIR)/man1
 
 
 .PHONY: uninstall
 uninstall:
+	# Python files installed using setup.py should be removed manually
 	rm -f $(DESTDIR)$(BINDIR)/$(PROJECT)
 	rm -f $(DESTDIR)$(MANDIR)/man1/$(PROJECT).1
 
@@ -120,7 +131,7 @@ sloccount:
 
 
 ###############################################################################
-#### Documentation
+#### Doxygen
 
 .PHONY: doc
 doc:
@@ -145,7 +156,8 @@ qtcreator:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(DIST_DIR)
+	rm -f MANIFEST
+	rm -rf todos/__pycache__
 	find . -name '*.pyc' -exec rm {} \;
-	find . -name '__pycache__' -exec rm -rf {} \;
 	find . -name '.coverage' -exec rm {} \;

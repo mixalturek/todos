@@ -39,6 +39,8 @@ setup(
             "http://downloads.sourceforge.net/project/todos/{0}/todos-{0}.zip".
             format(todos.version.TodosVersion.VERSION),
     keywords = ["search", "TODO", "FIXME", "comment"],
+    license = "GNU GPLv3",
+    platforms = "OS Independent",
     classifiers = [
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
