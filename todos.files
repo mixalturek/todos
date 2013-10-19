@@ -4,6 +4,9 @@
 ./logo/todos-32.png
 ./logo/todos-64.png
 ./Makefile
+./MANIFEST.in
+./README
+./setup.py
 ./tests/__init__.py
 ./tests/test_comment.py
 ./TODO
