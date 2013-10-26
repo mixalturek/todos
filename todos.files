@@ -13,6 +13,7 @@
 ./todos.config
 ./todos.creator
 ./todos.creator.user
+./todos/exceptions.py
 ./todos.files
 ./todos.includes
 ./todos/__init__.py

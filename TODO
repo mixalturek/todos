@@ -1,7 +1,3 @@
-Common
-	File headers, license.
-	Exit code 1 on error.
-
 Web
 	grep -rIn 'TODO' .
 

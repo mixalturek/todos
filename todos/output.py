@@ -34,6 +34,7 @@ import os.path
 from . import output_txt
 from . import output_xml
 from . import output_html
+from . import exceptions
 
 
 ###############################################################################
@@ -102,9 +103,8 @@ class OutputWriter(object):
             with open(path, mode='w', encoding=self.parameters.encoding) as out_stream:
                 self.output_data(out_stream, formatter, comments_search)
         except IOError as io_exception:
-            self.logger.error('Output failed: {0}, {1}'.format(
+            raise exceptions.TodosFatalError('Output failed: {0}, {1}'.format(
                     path, io_exception))
-            return
 
 
     def output_data(self, out_stream, formatter, comments_search):

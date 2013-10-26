@@ -21,26 +21,39 @@
 
 
 """
-Search TODO, FIXME and similar comments in project files.
+Exception classes.
 """
 
 
 ###############################################################################
 ####
 
-import sys
-from . import todos
-from . import exceptions
+class TodosException(Exception):
+    """
+    Base class for TODOs specific exceptions.
+    """
+
+    def __init__(self, value):
+        """
+        Class constructor.
+        """
+        super(TodosException, self).__init__()
+
+        self.value = value
+        # """ The exception value. """
+
+    def __str__(self):
+        """
+        Return a string representation of the exception.
+        """
+        return repr(self.value)
 
 
 ###############################################################################
 ####
 
-if __name__ == '__main__':
-    try:
-        TODOS = todos.Todos()
-        TODOS.main(sys.argv[1:])
-    except KeyboardInterrupt as keyboard_exception:
-        sys.exit('\nERROR: Interrupted by user')
-    except exceptions.TodosFatalError as todos_exception:
-        sys.exit('\nFATAL ERROR: {0}'.format(todos_exception.value))
+class TodosFatalError(TodosException):
+    """
+    Fatal error in TODOs.
+    """
+    pass

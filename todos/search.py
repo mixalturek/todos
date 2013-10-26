@@ -31,6 +31,8 @@ Searching of the comments.
 import os
 import re
 
+from . import exceptions
+
 
 ###############################################################################
 ####
@@ -147,7 +149,8 @@ class CommentsSearch(object):
                         Pattern(str_pattern, re.compile(str_pattern, flags))
                 )
             except re.error as re_exception:
-                self.logger.warn('Pattern compilation failed: {0}, {1}'.
+                raise exceptions.TodosFatalError(
+                        'Pattern compilation failed: {0}, {1}'.
                         format(str_pattern, re_exception))
 
 
@@ -275,7 +278,7 @@ class CommentsSearch(object):
             self.logger.warn('Reading from file failed: {0}, {1}'.
                     format(path, io_exception))
         except UnicodeError as unicode_exception:
-            self.logger.error('Skipping file (unicode error): {0}, {1}'.
+            self.logger.warn('Skipping file (unicode error): {0}, {1}'.
                     format(path, unicode_exception))
 
 
