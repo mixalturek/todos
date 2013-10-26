@@ -113,7 +113,8 @@ pylint:
 	@# W0511 - TODO/FIXME string in the code
 	@# R0201 - Method could be a function
 	@# R0903 - Too few public methods
-	pylint -f parseable -d W0511,R0201,R0903 $(PROJECT) | tee build/pylint.out
+	@# W0613 - Line too long
+	pylint -f parseable -d W0511,R0201,R0903,W0613 $(PROJECT) | tee build/pylint.out
 
 
 ###############################################################################

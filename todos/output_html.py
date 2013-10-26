@@ -356,9 +356,9 @@ tr:hover    { background-color: #C0C0FF; }
         self.writeln('</tbody>\n</table>\n', out_stream)
 
 
-    def writeln(self, str, out_stream):
+    def writeln(self, data, out_stream):
         """
         Write data to the output stream and append a new line.
         """
-        out_stream.write(str)
+        out_stream.write(data)
         out_stream.write('\n')

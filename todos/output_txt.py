@@ -92,9 +92,9 @@ class TxtFormatter(object):
         pass
 
 
-    def writeln(self, str, out_stream):
+    def writeln(self, data, out_stream):
         """
         Write data to the output stream and append a new line.
         """
-        out_stream.write(str)
+        out_stream.write(data)
         out_stream.write('\n')
