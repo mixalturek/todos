@@ -30,7 +30,6 @@ Searching of the comments.
 
 import os
 import re
-import codecs
 
 
 ###############################################################################
@@ -262,7 +261,7 @@ class CommentsSearch(object):
         self.logger.verbose('Parsing file: {0}'.format(path))
 
         try:
-            with codecs.open(path, 'r', self.parameters.encoding) as input_file:
+            with open(path, mode='r', encoding=self.parameters.encoding) as input_file:
                 lines = input_file.readlines()
 
             self.summary.total_files += 1

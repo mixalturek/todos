@@ -18,13 +18,13 @@
 ./todos/__init__.py
 ./todos/logger.py
 ./todos/__main__.py
-./todos/output_abstract.py
 ./todos/output_html.py
 ./todos/output.py
 ./todos/output_txt.py
 ./todos/output_xml.py
 ./todos/search.py
 ./todos/todos.py
+./todos/todos.xsd
 ./todos/version.py
 ./utils/create_readme.py
 ./utils/README.md.in

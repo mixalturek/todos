@@ -35,13 +35,12 @@ from operator import itemgetter
 from time import localtime, strftime
 
 from . import version
-from . import output_abstract
 
 
 ###############################################################################
 ####
 
-class HtmlFormatter(output_abstract.AbstractFormatter):
+class HtmlFormatter(object):
     """
     HTML formatter.
     """
@@ -51,8 +50,6 @@ class HtmlFormatter(output_abstract.AbstractFormatter):
         """
         Class constructor.
         """
-        super(HtmlFormatter, self).__init__()
-
         self.parameters = parameters
         # """ The input parameters. """
 
@@ -357,3 +354,11 @@ tr:hover    { background-color: #C0C0FF; }
 
 
         self.writeln('</tbody>\n</table>\n', out_stream)
+
+
+    def writeln(self, str, out_stream):
+        """
+        Write data to the output stream and append a new line.
+        """
+        out_stream.write(str)
+        out_stream.write('\n')

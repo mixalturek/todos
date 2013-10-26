@@ -28,17 +28,15 @@ Output the data in XML format.
 ###############################################################################
 ####
 
+import xml.etree.ElementTree as etree
+
 from . import version
-from . import output_abstract
 
 
 ###############################################################################
 ####
 
-# TODO: Use a XML library for the output
-# TODO: Define a XSD schema
-
-class XmlFormatter(output_abstract.AbstractFormatter):
+class XmlFormatter(object):
     """
     XML formatter.
     """
@@ -48,8 +46,6 @@ class XmlFormatter(output_abstract.AbstractFormatter):
         """
         Class constructor.
         """
-        super(XmlFormatter, self).__init__()
-
         self.parameters = parameters
         # """ The input parameters. """
 
@@ -65,48 +61,63 @@ class XmlFormatter(output_abstract.AbstractFormatter):
         """
         Write the header to the output stream.
         """
-        self.writeln('<?xml version="1.0" encoding="{0}" standalone="yes"?>'.format(
-                self.parameters.encoding), out_stream)
-
-        self.writeln('<todos version="{0}" fileformat="{1}">'.format(
-                version.TodosVersion.VERSION, version.TodosVersion.XML_VERSION),
-                out_stream)
-        self.writeln('\t<comments>', out_stream)
+        pass
 
 
     def write_data(self, out_stream, comments, summary):
         """
         Write the data to the output stream.
         """
+        el_comments = etree.Element('{http://todos.sourceforge.net}comments',
+                attrib = {
+                    '{http://todos.sourceforge.net}version':
+                            version.TodosVersion.VERSION,
+                })
+
         for comment in comments:
-            self.writeln('\t\t<comment pattern="{0}" "{1}" line="{2}">'.format(
-                    self.xml_special_chars(comment.str_pattern),
-                    self.xml_special_chars(comment.path),
-                    comment.position), out_stream)
+            el_comment = etree.SubElement(
+                el_comments, '{http://todos.sourceforge.net}comment',
+                attrib = {
+                    '{http://todos.sourceforge.net}pattern':comment.str_pattern,
+                    '{http://todos.sourceforge.net}file':comment.path,
+                    '{http://todos.sourceforge.net}line':str(comment.position)
+                }
+            )
 
-            for line in comment.lines:
-                self.writeln('\t\t\t{0}'.format(
-                        self.xml_special_chars(line)), out_stream)
+            el_comment.text = '\n'.join(comment.lines)
 
-            self.writeln('\t\t</comment>', out_stream)
+        self.indent(el_comments)
+        tree = etree.ElementTree(el_comments)
+
+        tree.write(out_stream,
+            encoding="unicode",
+            xml_declaration=True,
+            default_namespace='http://todos.sourceforge.net',
+            method="xml")
 
 
     def write_footer(self, out_stream):
         """
         Write the footer to the output stream.
         """
-        self.writeln('\t</comments>', out_stream)
-        self.writeln('</todos>', out_stream)
+        pass
 
 
-    def xml_special_chars(self, text):
+    def indent(self, elem, level=0):
         """
-        Replace all special characters by the XML entities and
-        return a new string.
+        Pretty print the XML document.
+        http://effbot.org/zone/element-lib.htm#prettyprint
         """
-        ret = text
-        ret = ret.replace('&', '&amp;')
-        ret = ret.replace('"', '&quot;')
-        ret = ret.replace('<', '&lt;')
-        ret = ret.replace('>', '&gt;')
-        return ret
+        i = '\n' + level*'\t'
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + '\t'
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                self.indent(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i

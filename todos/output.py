@@ -30,7 +30,6 @@ Output the data.
 
 import sys
 import os.path
-import codecs
 
 from . import output_txt
 from . import output_xml
@@ -68,8 +67,7 @@ class OutputWriter(object):
 
         if self.parameters.out_txt is not None:
             self.output_data_to_file(self.parameters.out_txt,
-                    output_txt.TxtFormatter(self.parameters.num_lines > 1),
-                    comments_search)
+                    output_txt.TxtFormatter(self.parameters), comments_search)
             output_written = True
 
         if self.parameters.out_xml is not None:
@@ -85,8 +83,7 @@ class OutputWriter(object):
         # Use stdout if no output method is explicitly specified
         if output_written == False:
             self.output_data(sys.stdout,
-                    output_txt.TxtFormatter(self.parameters.num_lines > 1),
-                    comments_search)
+                    output_txt.TxtFormatter(self.parameters), comments_search)
 
 
     def output_data_to_file(self, path, formatter, comments_search):
@@ -102,7 +99,7 @@ class OutputWriter(object):
             return
 
         try:
-            with codecs.open(path, 'w', self.parameters.encoding) as out_stream:
+            with open(path, mode='w', encoding=self.parameters.encoding) as out_stream:
                 self.output_data(out_stream, formatter, comments_search)
         except IOError as io_exception:
             self.logger.error('Output failed: {0}, {1}'.format(

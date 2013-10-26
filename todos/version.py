@@ -52,17 +52,3 @@ class TodosVersion(object):
     VERSION = '{0}.{1}.{2}'.format(VERSION_MAJOR, VERSION_MINOR,
             VERSION_REVISION)
     # """ Concatenated version parts of the application. """
-
-
-    XML_VERSION_MAJOR = 0
-    # """ Major version of the XML output format. """
-
-    XML_VERSION_MINOR = 1
-    # """ Minor version of the XML output format. """
-
-    XML_VERSION_REVISION = 0
-    # """ Revision of the XML output format. """
-
-    XML_VERSION = '{0}.{1}.{2}'.format(XML_VERSION_MAJOR, XML_VERSION_MINOR,
-            XML_VERSION_REVISION)
-    # """ Concatenated version parts of the XML output format. """

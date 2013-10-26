@@ -146,6 +146,8 @@ doc:
 qtcreator:
 	find . -type f \
 		| grep -v '^\./build' \
+		| grep -v '^\./dist' \
+		| grep -v '^\./MANIFEST$$' \
 		| grep -v '^\./\.' \
 		| grep -v '\.pyc$$' \
 		| sort > $(PROJECT).files

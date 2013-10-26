@@ -28,13 +28,12 @@ Output the data in TXT format.
 ###############################################################################
 ####
 
-from . import output_abstract
 
 
 ###############################################################################
 ####
 
-class TxtFormatter(output_abstract.AbstractFormatter):
+class TxtFormatter(object):
     """
     Text formatter.
     """
@@ -43,14 +42,12 @@ class TxtFormatter(output_abstract.AbstractFormatter):
     # """ Delimiter if multiline output is enabled. """
 
 
-    def __init__(self, multiline):
+    def __init__(self, parameters):
         """
         Class constructor.
         """
-        super(TxtFormatter, self).__init__()
-
-        self.multiline = multiline
-        # """ Multiple lines per pattern will be passed to the output. """
+        self.parameters = parameters
+        # """ The input parameters. """
 
 
     def get_type(self):
@@ -72,7 +69,7 @@ class TxtFormatter(output_abstract.AbstractFormatter):
         """
         Write the data to the output stream.
         """
-        if self.multiline:
+        if self.parameters.num_lines > 1:
             self.writeln(self.MULTILINE_DELIMITER, out_stream)
 
         for comment in comments:
@@ -83,7 +80,7 @@ class TxtFormatter(output_abstract.AbstractFormatter):
                         comment.path, position, line), out_stream)
                 position += 1
 
-            if self.multiline:
+            if self.parameters.num_lines > 1:
                 self.writeln(self.MULTILINE_DELIMITER, out_stream)
 
 
@@ -93,3 +90,11 @@ class TxtFormatter(output_abstract.AbstractFormatter):
         """
         # Empty
         pass
+
+
+    def writeln(self, str, out_stream):
+        """
+        Write data to the output stream and append a new line.
+        """
+        out_stream.write(str)
+        out_stream.write('\n')
