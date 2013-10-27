@@ -40,6 +40,15 @@ the terms of GNU GPL 3 license.</p>
 </ul>
 
 
+<h2>Similar Projects</h2>
+
+<ul>
+<li><?php Blank('http://www.gnu.org/software/grep/', 'GNU grep'); ?> - <code>grep -rI keyword .</code></li>
+<li><?php Blank('http://search.cpan.org/~mthurn/Devel-Todo-Find-1.012/', 'Devel::Todo::Find'); ?> - Search source code files for TODO comments.</li>
+<li><?php Blank('https://github.com/tiberiu/todo-issues', 'todo-issues'); ?> - Find TODO comments and make a github issue for each of them.</li>
+</ul>
+
+
 <h2>News</h2>
 
 <h3>27 October 2013</h3>

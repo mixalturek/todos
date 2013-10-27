@@ -29,16 +29,15 @@ body
 	margin: 0px;
 }
 
-#logo		{ margin: 2em; padding: 3em; background-color: white; }
-#footer		{ clear: both; text-align: center; margin: 2em; border-top: 1px solid gray; }
+#logo		{ margin: 0em 5em 4em 5em; padding: 4em; background-color: white; }
+#footer		{ margin: 2em 30% 1em 30%; clear: both; text-align: center; border-top: 1px solid gray; font-size: 9pt; }
 
-#sidebar	{ width: 17%; margin-left: 3%; padding-bottom: 30px; display: inline; float: left; text-align: left; }
-#sidebar .img	{ text-align: left; margin-bottom: 2em; }
-#page		{ margin: 0em 3% 3em 20%; }
+#sidebar	{ width: 17%; padding-bottom: 2em; display: inline; float: left; text-align: center; }
+#sidebar .img	{ margin-bottom: 2em; }
+#page		{ margin: 0em 20% 3em 20%; }
 
-#sidebar ul		{ margin-left: 1.5em; padding: 0px; }
+#sidebar ul		{ margin-left: 0em; padding: 0px; }
 #sidebar .label		{ font-weight: bold; }
-#screenshot		{ float: right; }
 
 
 p			{ margin-bottom: 1em; }
@@ -62,6 +61,7 @@ pre
 	text-align: left;
 	line-height: 1.1em;
 	overflow: auto;
+	padding: 0.1em;
 }
 
 img			{ border: none; }
