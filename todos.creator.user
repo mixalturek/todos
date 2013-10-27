@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 2.8.1, 2013-10-18T03:02:05. -->
+<!-- Written by QtCreator 2.8.1, 2013-10-27T17:47:54. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -199,7 +199,7 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">-m todos -f -e '\bTODO\b' '\bFIXME\b' '\bOPEN\b' '@[a-zA-Z]{2,3}@' -A 5 -o build/todos.txt -x build/todos.xml -m build/todos.html ~/tmp/s/</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">-m todos -f -e '\bTODO\b' '\bFIXME\b' '\bOPEN\b' '@[a-zA-Z]{2,3}@' -i -A 5 -o build/todos.txt -x build/todos.xml -m build/todos.html ~/tmp/s/</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">python3</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory">%{buildDir}</value>

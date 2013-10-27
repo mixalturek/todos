@@ -6,15 +6,14 @@ TODOs - search TODO, FIXME and similar comments in project files
 SYNOPSIS
 ========
 
-todos [OPTIONS] DIRECTORY [DIRECTORY...]
+todos.sh [OPTIONS] DIRECTORY [DIRECTORY...]
 
 DESCRIPTION
 ===========
 
 TODOs is a small command-line utility to search TODO, FIXME and similar
-comments in project files. It is licensed under the terms of GNU GPL 3
-license, it requires Python 3 interpreter for its execution and it is
-not platform specific.
+comments in project files. It is written in Python 3 and licensed under
+the terms of GNU GPL 3 license.
 
 OPTIONS
 =======
@@ -35,8 +34,8 @@ optional arguments:
                           the comment characters (default: ['#',
                           '//', '/*'])
     -e PATTERN [PATTERN ...], --regexp PATTERN [PATTERN ...]
-                          the pattern to search; see Python re module
-                          for proper syntax (default: ['\\bTODO\\b',
+                          pattern to search; see Python re module for
+                          proper syntax (default: ['\\bTODO\\b',
                           '\\bFIXME\\b'])
     -A NUM, --after-context NUM
                           number of lines that are sent to the output
@@ -52,15 +51,45 @@ optional arguments:
                           the files encoding (default: utf-8)
     -i, --ignore-case     ignore case distinctions (default: False)
     -o TXT, --out-txt TXT
-                          the output text file; standard output will
-                          be used if the path is not specified
+                          output text file; standard output will be
+                          used if no output file is specified
                           (default: None)
     -x XML, --out-xml XML
-                          the output XML file (default: None)
+                          output XML file (default: None)
     -m HTML, --out-html HTML
-                          the output HTML file (default: None)
+                          output HTML file (default: None)
     -f, --force           override existing output files (default:
                           False)
+
+EXAMPLES
+========
+
+Show help and exit.
+
+    todos.sh -h
+
+Search default comments with default settings in a current directory and
+display the results on standard output.
+
+    todos.sh
+
+Search default comments with verbose/debug output, rewrite any output
+file if it exists, skip .git and build directories and put the results
+to three files in TXT, XML and HTML formats.
+
+    todos.sh -v -f -D .git build -o todos.txt -x todos.xml -m todos.html
+
+Search TODO, FIXME, OPEN and @2-3 letters@ in all files under src
+directory, ignore case, append additional lines that follows the line
+with the occurrence and generate a HTML report.
+
+    todos.sh -f -e '\\bTODO\\b' '\\bFIXME\\b' '\\bOPEN\\b' '@[a-zA-Z]{2,3}@' \
+             -i -A 5 -m todos.html src
+
+BUGS
+====
+
+No bugs are known at the moment.
 
 SEE ALSO
 ========

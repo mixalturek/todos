@@ -1,0 +1,28 @@
+Install TODOs
+=============
+
+To extract and install TODOs python module and todos.sh:
+
+tar -xzf todos-VERSION.tar.gz
+cd todos-VERSION
+sudo python3 setup.py install
+
+
+To install TODOs manual page:
+
+sudo install -d /usr/local/man/man1
+sudo install -m 644 todos.1 /usr/local/man/man1/todos.1
+
+
+Uninstall TODOs
+===============
+
+To uninstall TODOs python module and todos.sh command:
+
+Python's distutils doesn't support uninstall command, you should delete all
+installed files manually - sorry. You can find the paths in the install output.
+
+
+To uninstall TODOs manual page:
+
+sudo rm /usr/local/man/man1/todos.1

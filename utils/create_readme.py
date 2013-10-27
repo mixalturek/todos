@@ -30,7 +30,7 @@ with open('utils/' + README_FILE + '.in') as input_file:
     old_readme = input_file.read()
 
 header = old_readme[:old_readme.index('# OPTIONS')]
-footer = old_readme[old_readme.index('# SEE ALSO'):]
+footer = old_readme[old_readme.index('# EXAMPLES'):]
 
 options = help_text[help_text.index('positional arguments'):]
 options = re.sub(r'^(\w.+)$', r'## \1', options, flags=re.MULTILINE)

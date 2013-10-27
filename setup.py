@@ -30,7 +30,7 @@ import todos.version
 setup(
     name = "todos",
     packages = ["todos"],
-    package_data = {"todos": ["*.xsd"]},
+    scripts=['todos.sh'],
     version = todos.version.TodosVersion.VERSION,
     description = "Search TODO, FIXME and similar comments in project files.",
     author = "Michal Turek",

@@ -90,7 +90,7 @@ class Todos(object):
         Parse all command line arguments and return them in object form.
         """
         parser = argparse.ArgumentParser(
-                prog='todos',
+                prog='todos.sh',
                 description='Search project directory for TODO, FIXME '
                         'and similar comments.',
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -122,7 +122,7 @@ class Todos(object):
         parser.add_argument(
                 '-e', '--regexp',
                 nargs='+',
-                help='the pattern to search; see Python re module for '
+                help='pattern to search; see Python re module for '
                         'proper syntax',
                 metavar='PATTERN',
                 dest='patterns',
@@ -173,22 +173,22 @@ class Todos(object):
                 '-o', '--out-txt',
                 metavar='TXT',
                 dest='out_txt',
-                help='the output text file; standard output will be used if '
-                        'the path is not specified'
+                help='output text file; standard output will be used if '
+                        'no output file is specified'
         )
 
         parser.add_argument(
                 '-x', '--out-xml',
                 metavar='XML',
                 dest='out_xml',
-                help='the output XML file'
+                help='output XML file'
         )
 
         parser.add_argument(
                 '-m', '--out-html',
                 metavar='HTML',
                 dest='out_html',
-                help='the output HTML file'
+                help='output HTML file'
         )
 
         parser.add_argument(

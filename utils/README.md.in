@@ -3,25 +3,57 @@
 # NAME
 TODOs - search TODO, FIXME and similar comments in project files
 
+
 # SYNOPSIS
-**todos** [OPTIONS] DIRECTORY [DIRECTORY...]
+**todos.sh** [OPTIONS] DIRECTORY [DIRECTORY...]
+
 
 # DESCRIPTION
 **TODOs** is a small command-line utility to search TODO, FIXME and similar
-comments in project files. It is licensed under the terms of GNU GPL 3 license,
-it requires Python 3 interpreter for its execution and it is not platform
-specific.
+comments in project files. It is written in Python 3 and licensed under the
+terms of GNU GPL 3 license.
+
 
 # OPTIONS
 
 
 
 
+# EXAMPLES
+
+Show help and exit.
+
+    todos.sh -h
+
+
+Search default comments with default settings in a current directory and display the results on standard output.
+
+    todos.sh
+
+
+Search default comments with verbose/debug output, rewrite any output file if it exists, skip .git and build directories and put the results to three files in TXT, XML and HTML formats.
+
+    todos.sh -v -f -D .git build -o todos.txt -x todos.xml -m todos.html
+
+
+Search TODO, FIXME, OPEN and @2-3 letters@ in all files under src directory, ignore case, append additional lines that follows the line with the occurrence and generate a HTML report.
+
+    todos.sh -f -e '\\bTODO\\b' '\\bFIXME\\b' '\\bOPEN\\b' '@[a-zA-Z]{2,3}@' \
+             -i -A 5 -m todos.html src
+
+
+# BUGS
+
+No bugs are known at the moment.
+
+
 # SEE ALSO
 See the TODOs website at http://todos.sourceforge.net/.
 
+
 # AUTHOR
 Written by Michal Turek.
+
 
 # COPYRIGHT
 Copyright (C) 2013 Michal Turek.  This file is part of TODOs.

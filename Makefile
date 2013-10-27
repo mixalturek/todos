@@ -71,10 +71,12 @@ README: $(BUILD_DIR)/README.txt
 #### Distribution packages
 
 .PHONY: dist
-dist:
+dist: $(BUILD_DIR)/$(PROJECT).1
+	cp build/$(PROJECT).1 .
 	$(PYTHON) setup.py sdist
 	# $(PYTHON) setup.py bdist_wininst
 	# $(PYTHON) setup.py bdist_rpm
+	rm $(PROJECT).1
 
 
 ###############################################################################
@@ -83,15 +85,14 @@ dist:
 .PHONY: install
 install: $(BUILD_DIR)/$(PROJECT).1
 	# $(PYTHON) setup.py install
-	install -d $(DESTDIR)$(MANDIR)/man1
-	install -m 644 $(BUILD_DIR)/$(PROJECT).1 $(DESTDIR)$(MANDIR)/man1
+	install -d $(MANDIR)/man1
+	install -m 644 $(BUILD_DIR)/$(PROJECT).1 $(MANDIR)/man1
 
 
 .PHONY: uninstall
 uninstall:
-	# Python files installed using setup.py should be removed manually
-	rm -f $(DESTDIR)$(BINDIR)/$(PROJECT)
-	rm -f $(DESTDIR)$(MANDIR)/man1/$(PROJECT).1
+	rm -f $(MANDIR)/man1/$(PROJECT).1
+	# Python files installed using setup.py must be removed manually
 
 
 ###############################################################################
@@ -138,6 +139,21 @@ sloccount:
 doc:
 	mkdir -p $(BUILD_DIR)/doc
 	doxygen Doxyfile
+
+
+###############################################################################
+#### Web
+
+.PHONY: web
+web:
+	mkdir -p $(BUILD_DIR)/web/
+	cp -rv web/*.css web/images/ $(BUILD_DIR)/web/
+	bash utils/offline_web.sh
+
+
+.PHONY: deployweb
+deployweb: web
+	bash utils/rsync_web.sh
 
 
 ###############################################################################
