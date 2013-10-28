@@ -198,7 +198,7 @@ tr:hover    { background-color: #C0C0FF; }
         self.writeln('<pre>', out_stream)
         self.writeln('cd {0}'.format(
                 self.html_special_chars(os.getcwd())), out_stream)
-        self.writeln(self.html_special_chars(' '.join(sys.argv)), out_stream)
+        self.writeln('todos.sh ' + self.html_special_chars(' '.join(sys.argv[1:])), out_stream)
         self.writeln('</pre>\n', out_stream)
 
         rows = [['Working Directory', self.html_special_chars(

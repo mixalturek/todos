@@ -37,6 +37,7 @@ the terms of GNU GPL 3 license.</p>
 <li>Search pattern is defined as Python's regular expression.</li>
 <li>A line with the occurrence can be output together with a close context around.</li>
 <li>TXT, HTML and XML output formats.</li>
+<li>Suitable for continuous integration.</li>
 </ul>
 
 

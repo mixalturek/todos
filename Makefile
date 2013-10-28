@@ -147,7 +147,7 @@ doc:
 .PHONY: web
 web:
 	mkdir -p $(BUILD_DIR)/web/
-	cp -rv web/*.css web/images/ $(BUILD_DIR)/web/
+	cp -rv web/todos.xsd web/*.css web/images/ $(BUILD_DIR)/web/
 	bash utils/offline_web.sh
 
 

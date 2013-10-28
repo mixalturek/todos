@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-language" content="en" />
+<title>Comments Report - TODOs</title>
+
+
+<style type="text/css" media="all">
+body
+{
+    margin: 2em; padding: 0px;
+    background-color: white; color: black;
+    font-family: Verdana, "Bitstream Vera Sans", Geneva, Arial, sans-serif;
+    font-size: 10pt; line-height: 1.6em;
+}
+
+pre         { line-height: 1.1em; margin: 0; margin: 0.2em 0 0.2em 0; }
+a:hover     { color: blue; }
+
+table       { margin-top: 1em; margin-bottom: 1em; max-width: 100%; }
+th          { background-color: #AFB3CC; text-align: left; }
+th, td      { vertical-align: top; padding: 0.2em 0.5em 0.2em 0.5em; }
+tr          { background-color: #D0D0EE; }
+tr:hover    { background-color: #C0C0FF; }
+
+#page       { margin-left: 17%; }
+#sidebar    { position: fixed; top: 0px; left: 0px; width: 14%; padding: 2em;
+                background-color: white; }
+#footer     { font-size: 9pt; margin-top: 2em; border-top: 1px solid silver;
+                color: gray; clear: both; }
+
+#sidebar .menu_title { font-weight: bold; font-size: 14pt; }
+#sidebar ul { margin-left: 1em; padding-left: 0px; }
+#sidebar ul ul { margin-left: 2em; padding-left: 0px; }
+</style>
+
+<style type="text/css" media="print">
+#page       { margin-left: 0px; }
+#sidebar    { display: none; }
+</style>
+
+</head>
+
+<body>
+
+<div id="sidebar">
+
+<div class="menu_title">Menu</div>
+
+<ul>
+<li><a href="#commentsReport">Comments Report</a>
+    <ul>
+    <li><a href="#inputParameters">Input Parameters</a></li>
+    <li><a href="#summary">Summary</a>
+        <ul>
+        <li><a href="#general">General</a></li>
+        <li><a href="#per_patterns">Per Patterns</a></li>
+        <li><a href="#per_files">Per Files</a></li>
+        </ul>
+    </li>
+    <li><a href="#details">Details</a></li>
+    </ul>
+</li>
+</ul>
+
+</div><!-- id="sidebar" -->
+<div id="page">
+<h1 id="commentsReport">Comments Report</h1>
+<h2 id="inputParameters">Input Parameters</h2>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>Computer</td>
+<td>evm</td>
+</tr>
+
+<tr>
+<td>User</td>
+<td>m</td>
+</tr>
+
+<tr>
+<td>Python</td>
+<td>3.3.2</td>
+</tr>
+
+</tbody>
+</table>
+
+<pre>
+cd /home/m/projects/graphal
+todos.sh -D history .git -o simple.txt -x simple.xml -m simple.html
+</pre>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>Working Directory</td>
+<td>/home/m/projects/graphal</td>
+</tr>
+
+<tr>
+<td>Verbose</td>
+<td>False</td>
+</tr>
+
+<tr>
+<td>Comments</td>
+<td>['#', '//', '/*']</td>
+</tr>
+
+<tr>
+<td>Patterns</td>
+<td>['\\bTODO\\b', '\\bFIXME\\b']</td>
+</tr>
+
+<tr>
+<td>Extensions</td>
+<td>None</td>
+</tr>
+
+<tr>
+<td>Suppressed Directories</td>
+<td>['history', '.git']</td>
+</tr>
+
+<tr>
+<td>Encoding</td>
+<td>utf-8</td>
+</tr>
+
+<tr>
+<td>Ignore Case</td>
+<td>False</td>
+</tr>
+
+<tr>
+<td>Number of Lines</td>
+<td>1</td>
+</tr>
+
+<tr>
+<td>Output TXT File</td>
+<td>simple.txt</td>
+</tr>
+
+<tr>
+<td>Output XML File</td>
+<td>simple.xml</td>
+</tr>
+
+<tr>
+<td>Output HTML File</td>
+<td>simple.html</td>
+</tr>
+
+<tr>
+<td>Force</td>
+<td>False</td>
+</tr>
+
+<tr>
+<td>Directories</td>
+<td>['.']</td>
+</tr>
+
+</tbody>
+</table>
+
+<h2 id="summary">Summary</h2>
+
+<h3 id="general">General</h3>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>Searched Patterns</td>
+<td>2</td>
+</tr>
+
+<tr>
+<td>Files with Matches</td>
+<td>8</td>
+</tr>
+
+<tr>
+<td>Total Files</td>
+<td>646</td>
+</tr>
+
+<tr>
+<td>Total Directories</td>
+<td>20</td>
+</tr>
+
+</tbody>
+</table>
+
+<h3 id="per_patterns">Per Patterns</h3>
+
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Occurrences</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>\bTODO\b</td>
+<td>11</td>
+</tr>
+
+<tr>
+<td>\bFIXME\b</td>
+<td>0</td>
+</tr>
+
+</tbody>
+</table>
+
+<h3 id="per_files">Per Files</h3>
+
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Occurrences</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/baseobject.cpp">./libgraphal/baseobject.cpp</a></td>
+<td>3</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/Makefile">./libgraphal/Makefile</a></td>
+<td>2</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/samples/tests.txt">./samples/tests.txt</a></td>
+<td>1</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/graphal_gui/texteditorprogrammers.cpp">./graphal_gui/texteditorprogrammers.cpp</a></td>
+<td>1</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/context.cpp">./libgraphal/context.cpp</a></td>
+<td>1</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/graphal_gui/mainwindow.cpp">./graphal_gui/mainwindow.cpp</a></td>
+<td>1</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/tests.cpp">./libgraphal/tests.cpp</a></td>
+<td>1</td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/web/style.css">./web/style.css</a></td>
+<td>1</td>
+</tr>
+
+</tbody>
+</table>
+
+<h2 id="details">Details</h2>
+
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Line</th>
+<th>Pattern</th>
+<th>Content</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td><a href="/home/m/projects/graphal/graphal_gui/mainwindow.cpp">./graphal_gui/mainwindow.cpp</a></td>
+<td>191</td>
+<td>\bTODO\b</td>
+<td><pre>			// editor-&gt;centerCursor();// TODO: only if it is not visible</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/graphal_gui/texteditorprogrammers.cpp">./graphal_gui/texteditorprogrammers.cpp</a></td>
+<td>252</td>
+<td>\bTODO\b</td>
+<td><pre>	// TODO: 4 is the space between the left border and the text, how to get it?</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/samples/tests.txt">./samples/tests.txt</a></td>
+<td>599</td>
+<td>\bTODO\b</td>
+<td><pre>	a[0] = var;// TODO</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/tests.cpp">./libgraphal/tests.cpp</a></td>
+<td>890</td>
+<td>\bTODO\b</td>
+<td><pre>// TODO: include, define...</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/context.cpp">./libgraphal/context.cpp</a></td>
+<td>370</td>
+<td>\bTODO\b</td>
+<td><pre>	// TODO: parse and execute specific commands here?</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/baseobject.cpp">./libgraphal/baseobject.cpp</a></td>
+<td>35</td>
+<td>\bTODO\b</td>
+<td><pre>	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/baseobject.cpp">./libgraphal/baseobject.cpp</a></td>
+<td>44</td>
+<td>\bTODO\b</td>
+<td><pre>	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/baseobject.cpp">./libgraphal/baseobject.cpp</a></td>
+<td>56</td>
+<td>\bTODO\b</td>
+<td><pre>	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/Makefile">./libgraphal/Makefile</a></td>
+<td>145</td>
+<td>\bTODO\b</td>
+<td><pre>	# TODO: optionally install header files of the shared library</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/libgraphal/Makefile">./libgraphal/Makefile</a></td>
+<td>152</td>
+<td>\bTODO\b</td>
+<td><pre>	# TODO: optionally uninstall header files of the shared library</pre></td>
+</tr>
+
+<tr>
+<td><a href="/home/m/projects/graphal/web/style.css">./web/style.css</a></td>
+<td>53</td>
+<td>\bTODO\b</td>
+<td><pre>.todo:before		{ /*content: &quot;TODO: &quot;;*/ }</pre></td>
+</tr>
+
+</tbody>
+</table>
+
+</div><!-- id="page" -->
+<p id="footer">
+Page generated: 2013-10-28 00:53:28, <a href="http://todos.sourceforge.net/">TODOs</a> 0.1.0
+</p>
+</body>
+</html>

@@ -1,0 +1,67 @@
+--
+./graphal_gui/mainwindow.cpp:191: 			// editor->centerCursor();// TODO: only if it is not visible
+./graphal_gui/mainwindow.cpp:192: 		}
+./graphal_gui/mainwindow.cpp:193: 
+./graphal_gui/mainwindow.cpp:194: 		editor->setFocus();
+./graphal_gui/mainwindow.cpp:195: 	}
+--
+./graphal_gui/texteditorprogrammers.cpp:252: 	// TODO: 4 is the space between the left border and the text, how to get it?
+./graphal_gui/texteditorprogrammers.cpp:253: 	int x = fontMetrics().maxWidth() * SETTINGS.getVertLinePos() + 4;
+./graphal_gui/texteditorprogrammers.cpp:254: 
+./graphal_gui/texteditorprogrammers.cpp:255: 	if(x > event->rect().x() && x < event->rect().x() + event->rect().width())
+./graphal_gui/texteditorprogrammers.cpp:256: 	{
+--
+./samples/tests.txt:599: 	a[0] = var;// TODO
+./samples/tests.txt:600: 	tverify(var == 1);
+./samples/tests.txt:601: 	tverify(a[0] == 1);
+./samples/tests.txt:602: 
+./samples/tests.txt:603: 	var = 2;
+--
+./libgraphal/tests.cpp:890: // TODO: include, define...
+./libgraphal/tests.cpp:891: 
+./libgraphal/tests.cpp:892: 
+./libgraphal/tests.cpp:893: /////////////////////////////////////////////////////////////////////////////
+./libgraphal/tests.cpp:894: ////
+--
+./libgraphal/context.cpp:370: 	// TODO: parse and execute specific commands here?
+./libgraphal/context.cpp:371: 	if(m_breakpointsEnabled)
+./libgraphal/context.cpp:372: 	{
+./libgraphal/context.cpp:373: 		INFO_P(_("Breakpoint, press any key..."));
+./libgraphal/context.cpp:374: 		getchar();
+--
+./libgraphal/baseobject.cpp:35: 	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads
+./libgraphal/baseobject.cpp:36: //	ACCESS_MUTEX_LOCKER;
+./libgraphal/baseobject.cpp:37: 	m_allocated_objects.insert(this);
+./libgraphal/baseobject.cpp:38: #endif // CHECK_MEMORY_LEAKS
+./libgraphal/baseobject.cpp:39: }
+--
+./libgraphal/baseobject.cpp:44: 	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads
+./libgraphal/baseobject.cpp:45: //	ACCESS_MUTEX_LOCKER;
+./libgraphal/baseobject.cpp:46: 	m_allocated_objects.erase(this);
+./libgraphal/baseobject.cpp:47: #endif // CHECK_MEMORY_LEAKS
+./libgraphal/baseobject.cpp:48: }
+--
+./libgraphal/baseobject.cpp:56: 	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads
+./libgraphal/baseobject.cpp:57: //	ACCESS_MUTEX_LOCKER;
+./libgraphal/baseobject.cpp:58: 	uint num_of_leaks = m_allocated_objects.size() - number_of_static_objects;
+./libgraphal/baseobject.cpp:59: 	stringstream ss;
+./libgraphal/baseobject.cpp:60: 	ss << "Number of memory leaks: " << num_of_leaks;
+--
+./libgraphal/Makefile:145: 	# TODO: optionally install header files of the shared library
+./libgraphal/Makefile:146: 
+./libgraphal/Makefile:147: 
+./libgraphal/Makefile:148: .PHONY: uninstall
+./libgraphal/Makefile:149: uninstall:
+--
+./libgraphal/Makefile:152: 	# TODO: optionally uninstall header files of the shared library
+./libgraphal/Makefile:153: 
+./libgraphal/Makefile:154: 
+./libgraphal/Makefile:155: ###############################################################################
+./libgraphal/Makefile:156: #### Clean
+--
+./web/style.css:53: .todo:before		{ /*content: "TODO: ";*/ }
+./web/style.css:54: .invalid_link		{ color: green; }
+./web/style.css:55: .cleaner		{ clear: both; }
+./web/style.css:56: .img			{ text-align: center; font-style: italic; }
+./web/style.css:57: 
+--

@@ -36,6 +36,21 @@
 </ul>
 
 
+<div class="label">Sample Output</div>
+
+<ul>
+<li><?php Web('samples/simple.txt', 'Simple TXT');?></li>
+<li><?php Web('samples/simple.html', 'Simple HTML');?></li>
+<li><?php Web('samples/simple.xml', 'Simple XML');?></li>
+</ul>
+
+<ul>
+<li><?php Web('samples/multiline.txt', 'Multiline TXT');?></li>
+<li><?php Web('samples/multiline.html', 'Multiline HTML');?></li>
+<li><?php Web('samples/multiline.xml', 'Multiline XML');?></li>
+</ul>
+
+
 <div class="label">Development</div>
 
 <ul>
@@ -44,7 +59,9 @@
 <li><?php Blank('http://sourceforge.net/p/todos/code/', 'Repository');?></li>
 <li><?php Blank('http://sourceforge.net/p/todos/code/commit_browser', 'Commits');?></li>
 <li><?php Blank('http://sourceforge.net/p/todos/tickets/', 'Tickets');?></li>
+<li><?php Web('todos.xsd', 'XSD schema');?></li>
 </ul>
+
 
 <div id="sf_logo"><a href="http://sourceforge.net/">
 <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=1805279&amp;type=2" alt="SourceForge.net" />

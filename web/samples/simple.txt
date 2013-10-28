@@ -1,0 +1,11 @@
+./graphal_gui/mainwindow.cpp:191: 			// editor->centerCursor();// TODO: only if it is not visible
+./graphal_gui/texteditorprogrammers.cpp:252: 	// TODO: 4 is the space between the left border and the text, how to get it?
+./samples/tests.txt:599: 	a[0] = var;// TODO
+./libgraphal/tests.cpp:890: // TODO: include, define...
+./libgraphal/context.cpp:370: 	// TODO: parse and execute specific commands here?
+./libgraphal/baseobject.cpp:35: 	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads
+./libgraphal/baseobject.cpp:44: 	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads
+./libgraphal/baseobject.cpp:56: 	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads
+./libgraphal/Makefile:145: 	# TODO: optionally install header files of the shared library
+./libgraphal/Makefile:152: 	# TODO: optionally uninstall header files of the shared library
+./web/style.css:53: .todo:before		{ /*content: "TODO: ";*/ }

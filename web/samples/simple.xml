@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<comments xmlns="http://todos.sourceforge.net" version="0.1.0">
+	<comment file="./graphal_gui/mainwindow.cpp" line="191" pattern="\bTODO\b">			// editor-&gt;centerCursor();// TODO: only if it is not visible</comment>
+	<comment file="./graphal_gui/texteditorprogrammers.cpp" line="252" pattern="\bTODO\b">	// TODO: 4 is the space between the left border and the text, how to get it?</comment>
+	<comment file="./samples/tests.txt" line="599" pattern="\bTODO\b">	a[0] = var;// TODO</comment>
+	<comment file="./libgraphal/tests.cpp" line="890" pattern="\bTODO\b">// TODO: include, define...</comment>
+	<comment file="./libgraphal/context.cpp" line="370" pattern="\bTODO\b">	// TODO: parse and execute specific commands here?</comment>
+	<comment file="./libgraphal/baseobject.cpp" line="35" pattern="\bTODO\b">	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads</comment>
+	<comment file="./libgraphal/baseobject.cpp" line="44" pattern="\bTODO\b">	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads</comment>
+	<comment file="./libgraphal/baseobject.cpp" line="56" pattern="\bTODO\b">	// TODO: GUI doesn't check memory leaks and CLI doesn't use threads</comment>
+	<comment file="./libgraphal/Makefile" line="145" pattern="\bTODO\b">	# TODO: optionally install header files of the shared library</comment>
+	<comment file="./libgraphal/Makefile" line="152" pattern="\bTODO\b">	# TODO: optionally uninstall header files of the shared library</comment>
+	<comment file="./web/style.css" line="53" pattern="\bTODO\b">.todo:before		{ /*content: "TODO: ";*/ }</comment>
+</comments>
