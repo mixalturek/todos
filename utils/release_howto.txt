@@ -7,6 +7,6 @@
 - make dist.
 - Build at Jenkins CI.
 - GIT tag.
-- Upload files.
+- Upload files to SourceForge and PyPI.
 - Deploy web.
 - Update version in todos/version.py.
