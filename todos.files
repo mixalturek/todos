@@ -30,13 +30,14 @@
 ./utils/create_readme.py
 ./utils/offline_web.sh
 ./utils/README.md.in
+./utils/release_howto.txt
 ./utils/rsync_web.sh
 ./web/changelog.php
 ./web/devel_contribute.php
 ./web/images/website/blank.gif
 ./web/images/website/down.gif
 ./web/images/website/logo.png
-./web/images/website/Untitled.png
+./web/images/website/web_ico_32.png
 ./web/images/website/web_ico.png
 ./web/index.php
 ./web/install.php
@@ -48,4 +49,11 @@
 ./web/print.css
 ./web/p_sidebar.php
 ./web/p_template.php
+./web/samples/multiline.html
+./web/samples/multiline.txt
+./web/samples/multiline.xml
+./web/samples/simple.html
+./web/samples/simple.txt
+./web/samples/simple.xml
 ./web/style.css
+./web/todos.xsd

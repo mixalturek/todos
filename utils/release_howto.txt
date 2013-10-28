@@ -1,0 +1,12 @@
+- Solve all TODOs and FIXMEs.
+- Check 'make tests'.
+- Update web pages.
+- Update web index.
+- Update ChangeLog.
+- Update version in todos/version.py.
+- make dist.
+- Build at Jenkins CI.
+- GIT tag.
+- Upload files.
+- Deploy web.
+- Update version in todos/version.py.

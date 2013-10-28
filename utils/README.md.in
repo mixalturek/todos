@@ -11,7 +11,7 @@ TODOs - search TODO, FIXME and similar comments in project files
 # DESCRIPTION
 **TODOs** is a small command-line utility to search TODO, FIXME and similar
 comments in project files. It is written in Python 3 and licensed under the
-terms of GNU GPL 3 license.
+terms of GNU GPL 3 license. Supported output formats are TXT, HTML and XML.
 
 
 # OPTIONS

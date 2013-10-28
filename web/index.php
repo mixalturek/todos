@@ -25,7 +25,7 @@ include 'p_begin.php';
 
 <p><em>TODOs</em> is a small command-line utility to search TODO, FIXME and similar
 comments in project files. It is written in Python 3 and licensed under
-the terms of GNU GPL 3 license.</p>
+the terms of GNU GPL 3 license. Supported output formats are TXT, HTML and XML.</p>
 
 
 <h2>Main Features</h2>
@@ -34,7 +34,7 @@ the terms of GNU GPL 3 license.</p>
 <li>Recursive scan of specific file types in a directory and its subdirectories.</li>
 <li>Directories as <em>CVS</em>, <em>.svn</em> and <em>.git</em> can be suppressed.</li>
 <li>Scanned files can be limited only to specific file types as <em>.java</em>, <em>.py</em> or <em>.cpp</em>.</li>
-<li>Search pattern is defined as Python's regular expression.</li>
+<li>Search patterns are defined as Python's regular expressions.</li>
 <li>A line with the occurrence can be output together with a close context around.</li>
 <li>TXT, HTML and XML output formats.</li>
 <li>Suitable for continuous integration.</li>
