@@ -46,7 +46,8 @@ the terms of GNU GPL 3 license. Supported output formats are TXT, HTML and XML.<
 <ul>
 <li><?php Blank('http://www.gnu.org/software/grep/', 'GNU grep'); ?> - <code>grep -rI keyword .</code></li>
 <li><?php Blank('http://search.cpan.org/~mthurn/Devel-Todo-Find-1.012/', 'Devel::Todo::Find'); ?> - Search source code files for TODO comments.</li>
-<li><?php Blank('https://github.com/tiberiu/todo-issues', 'todo-issues'); ?> - Find TODO comments and make a github issue for each of them.</li>
+<li><?php Blank('http://github.com/tiberiu/todo-issues', 'todo-issues'); ?> - Find TODO comments and make a github issue for each of them.</li>
+<li><?php Blank('http://pypi.python.org/pypi/todos/', 'todos'); ?> - a command line todos app for developers.</li>
 </ul>
 
 
