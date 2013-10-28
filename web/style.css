@@ -37,6 +37,7 @@ body
 #page		{ margin: 0em 20% 3em 20%; }
 
 #sidebar ul		{ margin-left: 0em; padding: 0px; }
+#sidebar ul li	{ list-style-type: none; }
 #sidebar .label		{ font-weight: bold; }
 
 

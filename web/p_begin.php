@@ -42,11 +42,11 @@ echo '<?xml version="1.0" encoding="utf-8"?>';
 
 <body>
 
-<a href="http://todos.sourceforge.net/">
 <div id="logo">
+<a href="http://todos.sourceforge.net/">
 <?php Img('images/website/logo.png', ''); ?>
-</div>
 </a>
+</div>
 
 <?php
 include_once 'p_sidebar.php';
