@@ -37,7 +37,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>';
 
 <style type="text/css" media="all">@import "style.css";</style>
 <style type="text/css" media="print">@import "print.css";</style>
-<link href="images/website/web_ico.png" rel="shortcut icon" type="image/x-icon" />
+<link href="images/website/todos-16.png" rel="shortcut icon" type="image/x-icon" />
 </head>
 
 <body>
