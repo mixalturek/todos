@@ -28,11 +28,13 @@
 <li><?php MenuItem('index', 'Home'); ?></li>
 <li><?php MenuItem('changelog', 'ChangeLog'); ?></li>
 <li><?php MenuItem('license', 'License'); ?></li>
+<li><?php MenuItem('screenshots', 'Screenshots'); ?></li>
 <li><?php Blank('http://sourceforge.net/projects/todos/files/', 'Download');?></li>
 <li><?php MenuItem('install', 'Install');?></li>
 <li><?php MenuItem('manual', 'Manual');?></li>
 <li><?php Blank('http://sourceforge.net/projects/todos/support', 'Support');?></li>
 <li><?php MenuItem('devel_contribute', 'Contact');?></li>
+<li><?php Blank('https://wiki.jenkins-ci.org/display/JENKINS/TODOs+Plugin', 'Jenkins TODOs Plugin');?></li>
 </ul>
 
 

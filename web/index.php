@@ -53,7 +53,13 @@ the terms of GNU GPL 3 license. Supported output formats are TXT, HTML and XML.<
 
 <h2>News</h2>
 
-<h3>27 October 2013</h3>
+<h3>19 Jan 2014</h3>
+<ul>
+<li>Version 0.2.0 released.</li>
+<li><?php Blank('https://wiki.jenkins-ci.org/display/JENKINS/TODOs+Plugin', 'TODOs Plugin'); ?> for <?php Blank('http://jenkins-ci.org/', 'Jenkins CI'); ?> implemented.</li>
+</ul>
+
+<h3>27 Oct 2013</h3>
 <ul>
 <li>Version 0.1.0 released. Initial release.</li>
 </ul>

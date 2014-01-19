@@ -43,7 +43,7 @@ class TodosVersion(object):
     VERSION_MAJOR = 0
     # """ Major version of the application. """
 
-    VERSION_MINOR = 1
+    VERSION_MINOR = 2
     # """ Minor version of the application. """
 
     VERSION_REVISION = 0

@@ -1,7 +1,18 @@
 Change log for TODOs project
 ============================
 
-Version 0.1.0 (27 October 2013)
--------------------------------
+Version 0.2.0 (19 Jan 2014)
+---------------------------
 
-* Initial release. Changes will be logged from now on.
+* Existing output files inside of the input directory are skipped during parsing.
+* Path with several directories can be suppressed (dir/subdir/suppress/me).
+* The presence of the output files is tested at the startup.
+* HTML/XML "<!--" added to default comment prefixes.
+* TODOs Plugin for Jenkins CI implemented.
+
+
+Version 0.1.0 (27 Oct 2013)
+---------------------------
+
+* Initial release.
+* Changes will be logged from now on.

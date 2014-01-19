@@ -19,11 +19,22 @@
  */
 
 
-define('PAGE_TITLE', 'Title');
+define('PAGE_TITLE', 'Screenshots');
 include 'p_begin.php';
 ?>
 
 
+<div class="screenshots">
+<?php
+Img('images/screenshots/txt_sm.jpg', 'TXT output');
+Img('images/screenshots/html_sm.jpg', 'HTML output');
+Img('images/screenshots/xml_sm.jpg', 'XML output');
+Img('images/screenshots/todos_config_sm.png', 'TODOs Plugin configuration');
+Img('images/screenshots/todos_details_sm.png', 'TODOs Plugin details');
+Img('images/screenshots/todos_summary_sm.png', 'TODOs Plugin summary');
+Img('images/screenshots/todos_trend_sm.png', 'TODOs Plugin trend');
+?>
+</div>
 
 
 <?php
