@@ -31,11 +31,13 @@ The application logic.
 import argparse
 import sys
 import codecs
+import os
 
 from . import logger
 from . import search
 from . import output
 from . import version
+from . import exceptions
 
 
 ###############################################################################
@@ -266,3 +268,23 @@ class Todos(object):
                     tmp_extensions.append('.' + extension)
 
             parameters.extensions = tmp_extensions
+
+        if not parameters.force:
+            if parameters.out_txt is not None:
+                if os.path.exists(parameters.out_txt):
+                    raise exceptions.TodosFatalError(
+                        'Output file exists, use force parameter to '
+                            'override: {0}'.format(parameters.out_txt))
+
+            if parameters.out_xml is not None:
+                if os.path.exists(parameters.out_xml):
+                    raise exceptions.TodosFatalError(
+                        'Output file exists, use force parameter to '
+                            'override: {0}'.format(parameters.out_xml))
+
+            if parameters.out_html is not None:
+                if os.path.exists(parameters.out_html):
+                    raise exceptions.TodosFatalError(
+                        'Output file exists, use force parameter to '
+                            'override: {0}'.format(parameters.out_html))
+

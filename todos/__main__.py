@@ -41,6 +41,6 @@ if __name__ == '__main__':
         TODOS = todos.Todos()
         TODOS.main(sys.argv[1:])
     except KeyboardInterrupt as keyboard_exception:
-        sys.exit('\nERROR: Interrupted by user')
+        sys.exit('ERROR: Interrupted by user')
     except exceptions.TodosFatalError as todos_exception:
-        sys.exit('\nFATAL ERROR: {0}'.format(todos_exception.value))
+        sys.exit('FATAL ERROR: {0}'.format(todos_exception.value))
