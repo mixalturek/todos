@@ -166,20 +166,27 @@ class CommentsSearch(object):
         Process all directories.
         """
         for directory in self.parameters.directories:
-            self.process_directory(directory, directory)
+            self.process_directory(directory)
 
 
-    def is_directory_suppressed(self, dir_name):
+    def is_directory_suppressed(self, directory):
         """
         Return true if the input directory should be skipped, otherwise false.
         """
         if self.parameters.suppressed is None:
             return False
 
-        return dir_name in self.parameters.suppressed
+        # Add slash at the end, the suppresed one from user may contain it
+        directoryWithSlash = os.path.join(directory, '')
+
+        for dir in self.parameters.suppressed:
+            if dir in directoryWithSlash:
+                return True
+
+        return False
 
 
-    def process_directory(self, directory, dir_name):
+    def process_directory(self, directory):
         '''
         Recursively search files in the input directory.
         '''
@@ -188,7 +195,7 @@ class CommentsSearch(object):
                     format(directory))
             return
 
-        if self.is_directory_suppressed(dir_name):
+        if self.is_directory_suppressed(directory):
             self.logger.verbose('Skipping directory (suppressed): {0}'.
                     format(directory))
             return
@@ -201,7 +208,7 @@ class CommentsSearch(object):
             if os.path.isfile(path):
                 self.process_file(path)
             else:
-                self.process_directory(path, item)
+                self.process_directory(path)
 
 
     def is_file_extension_allowed(self, path):

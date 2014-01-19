@@ -33,7 +33,7 @@ optional arguments:
     -v, --verbose         increase output verbosity (default: False)
     -c COMMENT [COMMENT ...], --comment COMMENT [COMMENT ...]
                           the comment characters (default: ['#',
-                          '//', '/*'])
+                          '//', '/*', '<!--'])
     -e PATTERN [PATTERN ...], --regexp PATTERN [PATTERN ...]
                           pattern to search; see Python re module for
                           proper syntax (default: ['\\bTODO\\b',
@@ -46,8 +46,9 @@ optional arguments:
                           check only files with the specified
                           extension (default: None)
     -D DIR [DIR ...], --suppressed DIR [DIR ...]
-                          suppress the specified directory (default:
-                          ['.git', '.svn', 'CVS'])
+                          suppress the specified directory; directory
+                          name or path (default: ['.git', '.svn',
+                          'CVS'])
     -n ENCODING, --encoding ENCODING
                           the files encoding (default: utf-8)
     -i, --ignore-case     ignore case distinctions (default: False)

@@ -1,3 +1,2 @@
 - Check that output files exist before parsing.
 - Skip parsing paths of output files.
-- <!-- comments for XML/HTML

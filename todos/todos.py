@@ -43,7 +43,7 @@ from . import version
 
 
 
-COMMENTS = ['#', '//', '/*']
+COMMENTS = ['#', '//', '/*', '<!--']
 PATTERNS = [r'\bTODO\b', r'\bFIXME\b']
 SUPPRESSED = ['.git', '.svn', 'CVS']
 DIRECTORIES = ['.']
@@ -151,7 +151,7 @@ class Todos(object):
                 '-D', '--suppressed',
                 metavar='DIR',
                 nargs='+',
-                help='suppress the specified directory',
+                help='suppress the specified directory; directory name or path',
                 default=SUPPRESSED
         )
 
