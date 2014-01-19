@@ -177,10 +177,10 @@ class CommentsSearch(object):
             return False
 
         # Add slash at the end, the suppresed one from user may contain it
-        directoryWithSlash = os.path.join(directory, '')
+        directory_with_slash = os.path.join(directory, '')
 
         for dir in self.parameters.suppressed:
-            if dir in directoryWithSlash:
+            if dir in directory_with_slash:
                 return True
 
         return False
@@ -225,6 +225,27 @@ class CommentsSearch(object):
         return False
 
 
+    def is_output_file(self, path):
+        """
+        Is the specified path one of the output files.
+        """
+        abs_path = os.path.abspath(path)
+
+        if self.parameters.out_txt is not None:
+            if abs_path == os.path.abspath(self.parameters.out_txt):
+                return True
+
+        if self.parameters.out_xml is not None:
+            if abs_path == os.path.abspath(self.parameters.out_xml):
+                return True
+
+        if self.parameters.out_html is not None:
+            if abs_path == os.path.abspath(self.parameters.out_html):
+                return True
+
+        return False
+
+
     def is_file_binary(self, path):
         """
         Return true if the input file is considered as binary, otherwise false.
@@ -262,6 +283,10 @@ class CommentsSearch(object):
         if not self.is_file_extension_allowed(path):
             self.logger.verbose('Skipping file (file extension): {0}'.
                     format(path))
+            return
+
+        if self.is_output_file(path):
+            self.logger.verbose('Skipping file (output file): {0}'.format(path))
             return
 
         if self.is_file_binary(path):
