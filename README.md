@@ -11,6 +11,16 @@ TODOs - search TODO, FIXME and similar comments in project files
 comments in project files. It is written in Python 3 and licensed under the
 terms of GNU GPL 3 license. Supported output formats are TXT, HTML and XML.
 
+## Features
+
+- Recursive scan of specific file types in a directory and its subdirectories.
+- Directories as CVS, .svn and .git can be suppressed.
+- Scanned files can be limited only to specific file types as .java, .py or .cpp.
+- Search patterns are defined as Python's regular expressions.
+- A line with the occurrence can be output together with a close context around.
+- TXT, HTML and XML output formats.
+- Suitable for continuous integration.
+
 
 # OPTIONS
 ## positional arguments:
