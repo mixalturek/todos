@@ -38,6 +38,7 @@ the terms of GNU GPL 3 license. Supported output formats are TXT, HTML and XML.<
 <li>A line with the occurrence can be output together with a close context around.</li>
 <li>TXT, HTML and XML output formats.</li>
 <li>Suitable for continuous integration.</li>
+<li><?php Blank('https://wiki.jenkins-ci.org/display/JENKINS/TODOs+Plugin', 'TODOs Plugin for Jenkins CI.'); ?></li>
 </ul>
 
 
