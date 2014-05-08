@@ -25,7 +25,7 @@ include 'p_begin.php';
 
 <pre>
 <?php
-safeReadFile('../README');
+safeReadFile('../build/README.txt');
 ?>
 </pre>
 
